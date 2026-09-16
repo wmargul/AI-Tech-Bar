@@ -1,0 +1,3736 @@
+// =============================================================================
+// AI TECH BAR — premium enterprise styles (jeden współdzielony moduł)
+// =============================================================================
+
+.app {
+  --c-bg-0: #0a0a16;
+  --c-bg-1: #141033;
+  --c-bg-2: #0d2a33;
+  --c-accent-from: #8b5cf6;
+  --c-accent-to: #22d3ee;
+  --c-text: #eef1ff;
+  --c-text-dim: #aab3d6;
+  --c-text-faint: #6b739b;
+  --c-card: rgba(255, 255, 255, 0.04);
+  --c-card-border: rgba(255, 255, 255, 0.1);
+  --font: "Segoe UI", "Segoe UI Web (West European)", system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  --mono: "SFMono-Regular", "Cascadia Mono", Consolas, "Liberation Mono", Menlo, monospace;
+
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 640px;
+  overflow: hidden;
+  font-family: var(--font);
+  color: var(--c-text);
+  background: var(--c-bg-0);
+  isolation: isolate;
+  -webkit-font-smoothing: antialiased;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  &.teams {
+    font-family: var(--font);
+  }
+}
+
+// Tryb pełnoekranowy — web part wychodzi z układu strony i pokrywa całe okno
+// (poza lewym paskiem SharePoint). Aktywny tylko w trybie odczytu.
+.fullscreen {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: var(--atb-left, 0px);
+  width: auto;
+  height: auto;
+  min-height: 0;
+  // Wysoko ponad całym chrome SharePointa (suite bar, app bar itd. < ~10k),
+  // ale PONIŻEJ warstwy Fluent `ms-Layer` (z-index 1 000 000), w której
+  // renderuje się karta osoby (LivePersonaCard). Dzięki temu w pełnym ekranie
+  // hover/klik na credits otwiera kartę NAD stroną, a nie pod nią.
+  z-index: 999990;
+}
+
+// ---------------------------------------------------------------------------
+// Interaktywne tło
+// ---------------------------------------------------------------------------
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bgGradient {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 90% at 18% 8%, #221a4d 0%, rgba(34, 26, 77, 0) 55%),
+    radial-gradient(120% 100% at 88% 92%, #0c3b42 0%, rgba(12, 59, 66, 0) 55%),
+    linear-gradient(160deg, #0d0a22 0%, #0a0a16 45%, #07141a 100%);
+}
+
+.bgGlow {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  width: 70%;
+  height: 60%;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(139, 92, 246, 0.28), rgba(139, 92, 246, 0) 70%);
+  filter: blur(20px);
+  animation: glowPulse 9s ease-in-out infinite;
+}
+
+.bgCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.65; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-52%) scale(1.08); }
+}
+
+// ---------------------------------------------------------------------------
+// Wspólne elementy
+// ---------------------------------------------------------------------------
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(8px);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  font-weight: 600;
+}
+
+.pillDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34e7c3;
+  box-shadow: 0 0 10px 2px rgba(52, 231, 195, 0.7);
+  animation: blink 2.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.gradientText {
+  background: linear-gradient(100deg, var(--c-accent-from), var(--c-accent-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.monoLabel {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+
+.monoLabelDim {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(107, 115, 155, 0.55);
+}
+
+// ---------------------------------------------------------------------------
+// WELCOME (screen 1) — overlay sterowany GSAP, zawsze wycentrowany, bez scrolla
+// ---------------------------------------------------------------------------
+.intro {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px 64px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 18% 8%, #221a4d 0%, rgba(34, 26, 77, 0) 55%),
+    radial-gradient(120% 100% at 88% 92%, #0c3b42 0%, rgba(12, 59, 66, 0) 55%),
+    linear-gradient(160deg, #0d0a22 0%, #0a0a16 45%, #07141a 100%);
+}
+
+// warstwy tła welcome (zapadają się indywidualnie przy wyjściu)
+.welcomeCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.welcomeGodRays {
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  width: 140%;
+  height: 120%;
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+  background:
+    conic-gradient(from 180deg at 50% 38%,
+      rgba(139, 92, 246, 0) 0deg,
+      rgba(139, 92, 246, 0.12) 30deg,
+      rgba(34, 211, 238, 0) 70deg,
+      rgba(139, 92, 246, 0.1) 120deg,
+      rgba(34, 211, 238, 0.1) 200deg,
+      rgba(139, 92, 246, 0) 300deg,
+      rgba(139, 92, 246, 0.12) 340deg,
+      rgba(139, 92, 246, 0) 360deg);
+  filter: blur(28px);
+  opacity: 0.7;
+  animation: godRaysSpin 38s linear infinite;
+}
+
+@keyframes godRaysSpin {
+  to { transform: translateX(-50%) rotate(360deg); }
+}
+
+.welcomeGlow {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  width: 60%;
+  height: 60%;
+  transform: translateX(-50%);
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(139, 92, 246, 0.4), rgba(139, 92, 246, 0) 70%);
+  filter: blur(24px);
+  animation: glowPulse 9s ease-in-out infinite;
+}
+
+.welcomeBloom {
+  position: fixed;
+  z-index: 2;
+  width: 520px;
+  height: 520px;
+  margin-left: -260px;
+  margin-top: -260px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(closest-side, rgba(178, 155, 255, 0.55), rgba(110, 231, 255, 0.18) 45%, transparent 72%);
+}
+
+.welcomeContent {
+  position: relative;
+  z-index: 5;
+  width: min(1240px, 94vw);
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 22px;
+}
+
+.welcomeTitle {
+  margin: 6px 0 0;
+  // 1:1 z referencją cornrevolution.resn.global — masywny, lekko „kwadratowy"
+  // grotesk (Saira), biały, prawie pełna szerokość bloku, duża skala jak na nagraniu.
+  font-family: 'CornSaira', 'Segoe UI', system-ui, sans-serif;
+  font-size: clamp(38px, 7.6vw, 112px);
+  line-height: 1.0;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  color: #ffffff;
+  white-space: nowrap;
+  perspective: 800px;
+  overflow: visible;
+}
+
+.titleWord { display: inline-flex; }
+.titleSpace { display: inline-block; }
+
+// Wrapper tytułu — kotwica dla nakładki canvas (hover: fill→kontur + konstelacja).
+.titleFxWrap {
+  position: relative;
+  display: block;
+}
+
+// Canvas z interaktywną wersją napisu (leży nad statycznym <h1>, który po
+// animacji wejścia jest wygaszany). Nie blokuje kliknięć.
+.titleFxCanvas {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.titleChar {
+  display: inline-block;
+  // Zapas w pionie, by przy background-clip:text nie ucinało górnych
+  // akcentów/kropek i dolnych ogonków (ś, ż, ą, ę, j…).
+  padding: 0.16em 0 0.2em;
+  line-height: 1;
+  will-change: transform, opacity;
+}
+
+.welcomeSubtitle {
+  margin: 0;
+  max-width: 640px;
+  font-size: clamp(14px, 1.45vw, 17px);
+  line-height: 1.55;
+  letter-spacing: 0.005em;
+  color: rgba(233, 238, 252, 0.72);
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 17px 34px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0a0a16;
+  background: linear-gradient(100deg, #b39bff, #6ee7ff);
+  box-shadow: 0 12px 40px rgba(110, 160, 255, 0.4), 0 0 0 0 rgba(139, 92, 246, 0.5);
+  transition: transform 0.25s ease, box-shadow 0.35s ease;
+  position: relative;
+}
+
+.ctaButton svg { transition: transform 0.25s ease; }
+
+.ctaButton:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 18px 54px rgba(110, 160, 255, 0.55), 0 0 0 6px rgba(139, 92, 246, 0.18);
+}
+
+.ctaButton:hover svg { transform: translateX(4px); }
+.ctaButton:active { transform: translateY(0) scale(0.99); }
+
+.welcomeHint {
+  margin-top: 6px;
+  text-align: center;
+}
+
+.welcomeCredit {
+  position: absolute;
+  z-index: 5;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+// Wyróżnione, ale wciąż subtelne nazwisko w credits (welcome)
+.creditName {
+  color: rgba(198, 208, 240, 0.78);
+  font-weight: 600;
+  letter-spacing: 0.32em;
+}
+
+// Host karty osoby (kotwica pozycjonowania dla LivePersonaCard)
+.personaHost {
+  display: inline-flex;
+  align-items: center;
+}
+
+// Wyzwalacz karty osoby (sam hover) — subtelne podświetlenie.
+// UWAGA: display musi być inline, żeby spacja między „by” a nazwiskiem
+// nie była usuwana (flex traktowałby je jak osobne elementy bez odstępu).
+.creditTrigger {
+  display: inline;
+  cursor: default;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.creditTrigger:hover { opacity: 1; }
+.creditTrigger:hover .creditName { color: rgba(214, 224, 255, 0.95); }
+
+.welcomeLang {
+  position: absolute;
+  z-index: 6;
+  right: 28px;
+  bottom: 24px;
+}
+
+@media (max-width: 600px) {
+  .welcomeLang { right: 16px; bottom: 16px; }
+}
+
+// Subtelny, mały podpis na właściwej stronie (po animacji)
+.appCredit {
+  position: absolute;
+  z-index: 4;
+  right: 16px;
+  bottom: 10px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(107, 115, 155, 0.32);
+  opacity: 0;
+  animation: appCreditIn 0.8s ease 0.6s forwards;
+}
+
+// Wyzwalacz karty osoby (sam hover) na mikro-podpisie
+.appCreditTrigger {
+  display: inline;
+  cursor: default;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.appCreditTrigger:hover { color: rgba(168, 178, 215, 0.7); }
+.appCreditTrigger:hover .appCreditName { color: rgba(214, 224, 255, 0.9); }
+
+// Wyróżnione, ale subtelne nazwisko w credits (po animacji)
+.appCreditName {
+  color: rgba(168, 178, 215, 0.6);
+  font-weight: 600;
+}
+
+@keyframes appCreditIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .appCredit { right: 10px; bottom: 6px; font-size: 7px; letter-spacing: 0.16em; }
+}
+
+// ---------------------------------------------------------------------------
+// PRZEŁĄCZNIK TRYBU PEŁNOEKRANOWEGO (lewy górny róg) + KOMUNIKAT
+// ---------------------------------------------------------------------------
+.fsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px 7px 9px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: rgba(12, 12, 26, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--c-text);
+  font-family: var(--font);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.fsToggle:hover {
+  transform: translateY(-1px);
+  border-color: rgba(139, 92, 246, 0.6);
+  background: rgba(20, 16, 51, 0.7);
+}
+
+.fsTrack {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  transition: background 0.28s ease;
+  flex: 0 0 auto;
+}
+
+.fsTrackOn {
+  background: linear-gradient(100deg, #8b5cf6, #22d3ee);
+}
+
+.fsKnob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fsTrackOn .fsKnob {
+  transform: translateX(18px);
+}
+
+.fsLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.langToggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(12, 12, 26, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.langToggle:hover {
+  border-color: rgba(139, 92, 246, 0.6);
+  background: rgba(20, 16, 51, 0.7);
+}
+
+.langOpt {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  background: transparent;
+  color: var(--c-text-dim);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: color 0.2s ease, background 0.28s ease, box-shadow 0.28s ease;
+}
+
+.langOpt:hover { color: #fff; }
+
+.langOptActive {
+  color: #0a0a16;
+  background: linear-gradient(100deg, #8b5cf6, #22d3ee);
+  box-shadow: 0 4px 14px rgba(34, 211, 238, 0.3);
+}
+
+.langOptActive:hover { color: #0a0a16; }
+
+.fsHint {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 61;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(620px, calc(100% - 200px));
+  padding: 12px 14px 12px 16px;
+  border-radius: 14px;
+  background: rgba(16, 14, 38, 0.86);
+  border: 1px solid rgba(139, 92, 246, 0.45);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 18px 50px rgba(8, 10, 30, 0.6);
+  color: var(--c-text);
+  animation: fsHintIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fsHintIn {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.fsHintStar {
+  color: #fbbf24;
+  font-size: 16px;
+  flex: 0 0 auto;
+}
+
+.fsHintText {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--c-text-dim);
+}
+
+.fsHintText strong { color: #fff; }
+
+.fsHintCta {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: #0a0a16;
+  background: linear-gradient(100deg, #b39bff, #6ee7ff);
+  transition: transform 0.2s ease;
+}
+
+.fsHintCta:hover { transform: translateY(-1px); }
+
+.fsHintClose {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--c-text-faint);
+  font-size: 20px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.fsHintClose:hover { color: #fff; }
+
+@media (max-width: 600px) {
+  .fsLabel { display: none; }
+  .fsHint { max-width: calc(100% - 90px); }
+  .fsHintText { font-size: 12px; }
+}
+
+// ---------------------------------------------------------------------------
+// LANDING
+// ---------------------------------------------------------------------------
+.landing {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.5) transparent;
+}
+
+// podczas intro — strona ukryta pod overlayem i niescrollowalna
+.landingLocked {
+  overflow: hidden;
+}
+
+// tryb full-page (jeden gest = jeden panel) — bez natywnego scrolla/scrollbara
+.landingSnap {
+  overflow: hidden;
+}
+
+.page {
+  transform-origin: 50% 50%;
+  will-change: transform, opacity, filter;
+}
+
+.landing::-webkit-scrollbar { width: 8px; }
+.landing::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--c-accent-from), var(--c-accent-to));
+  border-radius: 8px;
+}
+
+.section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 90px 24px;
+  // fade-in / fade-out paneli przy aktywacji (full-page, klimat enterprise)
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.sectionActive {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sectionInner {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.sectionHead {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.sectionKicker {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+.sectionLead {
+  margin: 0;
+  font-size: clamp(14px, 1.5vw, 17px);
+  line-height: 1.6;
+  color: var(--c-text-dim);
+}
+
+// ---------- HERO (screen 2) ----------
+.heroSection { text-align: center; }
+
+.heroInner {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+}
+
+.heroTitle {
+  margin: 8px 0 0;
+  font-size: clamp(34px, 6.4vw, 76px);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.03;
+}
+
+.heroSubtitle {
+  margin: 0;
+  max-width: 560px;
+  font-size: clamp(14px, 1.6vw, 17px);
+  line-height: 1.6;
+  color: var(--c-text-dim);
+}
+
+// Kafelki nawigacji w Hero — wygląd kart (jak dawne statystyki),
+// ale klikalne i prowadzące do sekcji.
+.navCards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.navCard {
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 26px;
+  border-radius: 18px;
+  cursor: pointer;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.navCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(139, 92, 246, 0.45);
+}
+
+.navCardLabel {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  transition: color 0.25s ease;
+}
+
+.navCard:hover .navCardLabel {
+  color: #fff;
+}
+
+.scrollHint {
+  margin-top: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+  transition: color 0.2s ease;
+}
+
+.scrollHint:hover { color: var(--c-text); }
+
+.scrollCaret {
+  width: 2px;
+  height: 22px;
+  border-radius: 2px;
+  background: linear-gradient(var(--c-accent-from), var(--c-accent-to));
+  animation: caretBounce 1.6s ease-in-out infinite;
+}
+
+@keyframes caretBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+
+// ---------- CEL ----------
+// Scena trzyma siatkę i nakładkę z powiększonym kafelkiem (FLIP w CelSection.tsx).
+.goalStage {
+  position: relative;
+}
+
+.goalGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 18px;
+  transition: opacity 0.62s cubic-bezier(0.22, 1, 0.36, 1), transform 0.62s cubic-bezier(0.22, 1, 0.36, 1), filter 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+// Gdy któryś kafelek jest powiększony — siatka tła spokojnie gaśnie i cofa się
+// w głąb (lekki blur + odsunięcie), budując wrażenie głębi pod nakładką.
+.goalGrid[data-dimmed='true'] {
+  opacity: 0;
+  transform: scale(0.955);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.goalCard {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  cursor: pointer;
+  padding: 26px;
+  border-radius: 20px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 200px;
+  color: var(--c-text);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+// W zwiniętej siatce strzałka „Dopasuj narzędzie" jest częścią wyśrodkowanego stosu,
+// więc nie spychamy jej na dół (margin-top:auto stosujemy tylko w nakładce).
+.goalCard .goalArrow { margin-top: 0; justify-content: center; }
+
+.goalCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 22px 50px rgba(8, 10, 30, 0.55);
+}
+
+.goalGlow {
+  position: absolute;
+  top: -60%;
+  right: -30%;
+  width: 70%;
+  height: 120%;
+  opacity: 0;
+  filter: blur(40px);
+  transition: opacity 0.4s ease;
+}
+
+.goalCard:hover .goalGlow { opacity: 0.35; }
+
+.goalIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+// Naga ikona (liniowe SVG, bez kolorowego kwadratu) — w rozmiarze dawnych kwadratów (siatka Cel).
+.goalIconBare {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.4));
+  transition: transform 0.3s ease;
+}
+
+// Spójna liniowa ikona celu w siatce.
+.goalGlyphSvg {
+  width: 46px;
+  height: 46px;
+  color: #fff;
+}
+
+.goalCard:hover .goalIconBare { transform: scale(1.08); }
+
+.goalIndex {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  color: var(--c-text-faint);
+}
+
+.goalTitle {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.goalTools {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7ee0ff;
+}
+
+.goalArrow {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text-dim);
+  transition: gap 0.25s ease, color 0.25s ease;
+}
+
+.goalCard:hover .goalArrow { gap: 14px; color: #fff; }
+
+// --- Powiększony kafelek (nakładka na cały obszar siatki) ---
+.goalExpandCard {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  padding: 44px;
+  border-radius: 24px;
+  // Jednolite tło w tonacji tła klipów (głęboki granat) — na całej powierzchni
+  // kafelka, z delikatną poświatą po prawej, gdzie „siada" animowana grafika.
+  background:
+    radial-gradient(135% 125% at 82% 40%, rgba(52, 40, 104, 0.42) 0%, rgba(12, 10, 40, 0.86) 42%, rgba(5, 3, 26, 1) 78%),
+    #04021c;
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 30px 80px rgba(8, 10, 30, 0.62);
+  color: var(--c-text);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  will-change: transform;
+}
+
+// Podczas zwijania nakładka jest tylko animowana — nieklikalna.
+.goalExpandCard[data-closing='true'] { pointer-events: none; }
+
+.goalExpandGlow {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -45%;
+  height: 85%;
+  opacity: 0.4;
+  filter: blur(70px);
+  pointer-events: none;
+}
+
+.goalExpandIcon {
+  box-sizing: border-box;
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 46px;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42);
+}
+
+.goalExpandTitle {
+  position: relative;
+  z-index: 3;
+  margin-top: auto;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.12;
+  max-width: 680px;
+}
+
+.goalExpandCard .goalTools { position: relative; z-index: 3; font-size: 13px; }
+.goalExpandCard .goalArrow { position: relative; z-index: 3; font-size: 15px; }
+.goalExpandCard .goalIndex { top: 36px; right: 40px; font-size: 15px; }
+// Zostaw miejsce u dołu na pasek nawigacyjny (podpis + ikony).
+.goalExpandCard { padding-bottom: 144px; }
+
+// --- Pasek nawigacyjny: podpis + zminimalizowane ikony pozostałych celów (pod spodem) ---
+.goalNavWrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px; // większy odstęp między podpisem a ikonami
+  pointer-events: none; // tło/przerwy przepuszczają zdarzenia do kafelka
+}
+
+.goalNavLabel {
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+
+.goalNav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.goalNavChip {
+  position: relative;
+  pointer-events: auto;
+  box-sizing: border-box;
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  line-height: 1;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.goalNavChip:hover {
+  transform: translateY(-7px) scale(1.04);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 20px 44px rgba(8, 10, 30, 0.55);
+}
+
+// Spójna liniowa ikona celu na pasku nawigacyjnym.
+.goalNavGlyph {
+  width: 27px;
+  height: 27px;
+  color: #fff;
+}
+
+// Dymek z tytułem celu — mocno przezroczysty, szklany; pod ikoną; widoczny tylko na hover.
+.goalNavTip {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  white-space: nowrap;
+  padding: 7px 13px;
+  border-radius: 11px;
+  background: rgba(22, 24, 48, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--c-text);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 14px 34px rgba(8, 10, 30, 0.4);
+  backdrop-filter: blur(16px) saturate(150%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 7;
+}
+
+.goalNavTip::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: rgba(255, 255, 255, 0.16);
+}
+
+.goalNavChip:hover .goalNavTip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+// Podczas zwijania pasek jest tylko animowany — ikony nieklikalne.
+.goalNavWrap[data-closing='true'] .goalNavChip { pointer-events: none; }
+
+// --- Klip celu jako TŁO całego kafelka ---
+// Wideo wypełnia cały kafelek (object-fit: cover), więc tło i grafika to jedno
+// źródło — zero kontrastu między motywem a resztą. Lewą stronę (pod tytuł)
+// wygaszamy tym samym granatem co tło kafelka, dzięki czemu przejście jest
+// niewidoczne, a motyw czytelnie „siada" po prawej.
+.goalExpandArt {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  pointer-events: none;
+}
+
+.goalVideoEl {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 64% 50%; // motyw przesunięty w prawo
+  display: block;
+  // Zaokrąglenie NA samym <video> — przeglądarki nie zawsze przycinają element
+  // wideo do border-radius rodzica (kwadratowe rogi „wystawały" jako trójkąty).
+  border-radius: 24px;
+}
+
+// Wygaszenie lewej strony (i lekko dołu) tym samym granatem co kafelek —
+// jednolite, bez krawędzi; robi miejsce na tekst i przesuwa akcent w prawo.
+.goalExpandArt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, #04021c 0%, rgba(4, 2, 28, 0.98) 22%, rgba(4, 2, 28, 0.62) 42%, rgba(4, 2, 28, 0) 60%),
+    linear-gradient(0deg, rgba(4, 2, 28, 0.55) 0%, rgba(4, 2, 28, 0) 34%);
+  pointer-events: none;
+}
+
+@keyframes goalArtFloat {
+  0%, 100% { transform: translateY(-50%) translateZ(0); }
+  50% { transform: translateY(calc(-50% - 9px)) translateZ(0); }
+}
+
+// Mały wariant w siatce (bez kolorowego kwadratu).
+.goalArtSmall {
+  flex: none;
+  width: 64px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.giwRoot {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+// Zawijasy „tekstu" — domyślnie nienarysowane i całkowicie niewidoczne
+// (opacity 0 zapobiega „kropkom" od zaokrąglonych końcówek przed pisaniem).
+.giwLine {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+.giwPen {
+  transform-box: view-box;
+  transform-origin: 150px 120px; // czubek długopisa
+}
+
+.giwSpark {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.5;
+}
+
+// Delikatne „oddychanie" całej sceny + pulsująca poświata (efekt „żywej" grafiki).
+.giwGlow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+// Grupa zeszytu (otwarty rozkład).
+.giwBook {
+  transform-box: view-box;
+  transform-origin: 110px 100px;
+}
+
+// Animacje grają tylko w widoku rozwiniętym (.giwAnim). Pełny cykl: 7.5s.
+.giwAnim .giwFloat { animation: giwFloat 6s ease-in-out infinite; }
+.giwAnim .giwGlow { animation: giwGlowPulse 5s ease-in-out infinite; }
+.giwAnim .giwL1 { animation: giwL1 7.5s ease-in-out infinite; }
+.giwAnim .giwL2 { animation: giwL2 7.5s ease-in-out infinite; }
+.giwAnim .giwL3 { animation: giwL3 7.5s ease-in-out infinite; }
+.giwAnim .giwL4 { animation: giwL4 7.5s ease-in-out infinite; }
+.giwAnim .giwR1 { animation: giwR1 7.5s ease-in-out infinite; }
+.giwAnim .giwR2 { animation: giwR2 7.5s ease-in-out infinite; }
+.giwAnim .giwR3 { animation: giwR3 7.5s ease-in-out infinite; }
+.giwAnim .giwR4 { animation: giwR4 7.5s ease-in-out infinite; }
+.giwAnim .giwPen { animation: giwPenWrite 7.5s ease-in-out infinite; }
+.giwAnim .giwSpark1 { animation: giwTwinkle 2.6s ease-in-out infinite; }
+.giwAnim .giwSpark2 { animation: giwTwinkle 2.6s ease-in-out infinite 0.7s; }
+.giwAnim .giwSpark3 { animation: giwTwinkle 2.6s ease-in-out infinite 1.3s; }
+
+// Lewa strona zeszytu — rysowana jako pierwsza.
+// Atrament „pojawia się" wraz z kreśleniem (opacity 0→1 razem z dashoffset 1→0) — bez kropki na starcie.
+@keyframes giwL1 {
+  0%, 10% { stroke-dashoffset: 1; opacity: 0; }
+  19%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes giwL2 {
+  0%, 21% { stroke-dashoffset: 1; opacity: 0; }
+  30%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes giwL3 {
+  0%, 32% { stroke-dashoffset: 1; opacity: 0; }
+  41%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes giwL4 {
+  0%, 43% { stroke-dashoffset: 1; opacity: 0; }
+  50%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+// Prawa strona zeszytu — rysowana jako druga.
+@keyframes giwR1 {
+  0%, 54% { stroke-dashoffset: 1; opacity: 0; }
+  61%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes giwR2 {
+  0%, 63% { stroke-dashoffset: 1; opacity: 0; }
+  70%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes giwR3 {
+  0%, 72% { stroke-dashoffset: 1; opacity: 0; }
+  79%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes giwR4 {
+  0%, 81% { stroke-dashoffset: 1; opacity: 0; }
+  88%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+// Długopis: spoczynek → pisze 4 linijki na lewej → przejazd → pisze 4 linijki na prawej → powrót.
+@keyframes giwPenWrite {
+  0%, 5%   { transform: translate(0px, 0px) rotate(0deg); }
+  10% { transform: translate(-98px, -40px) rotate(-20deg); }
+  19% { transform: translate(-54px, -40px) rotate(-20deg); }
+  21% { transform: translate(-98px, -28px) rotate(-20deg); }
+  30% { transform: translate(-54px, -28px) rotate(-20deg); }
+  32% { transform: translate(-98px, -16px) rotate(-20deg); }
+  41% { transform: translate(-54px, -16px) rotate(-20deg); }
+  43% { transform: translate(-98px, -4px) rotate(-20deg); }
+  50% { transform: translate(-54px, -4px) rotate(-20deg); }
+  54% { transform: translate(-34px, -36px) rotate(-24deg); }
+  61% { transform: translate(10px, -36px) rotate(-24deg); }
+  63% { transform: translate(-34px, -24px) rotate(-24deg); }
+  70% { transform: translate(10px, -24px) rotate(-24deg); }
+  72% { transform: translate(-34px, -12px) rotate(-24deg); }
+  79% { transform: translate(10px, -12px) rotate(-24deg); }
+  81% { transform: translate(-34px, 0px) rotate(-24deg); }
+  88% { transform: translate(10px, 0px) rotate(-24deg); }
+  95%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+}
+
+@keyframes giwFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes giwGlowPulse {
+  0%, 100% { opacity: 0.65; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes giwTwinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .giwAnim .giwFloat,
+  .giwAnim .giwGlow,
+  .giwAnim .giwL1,
+  .giwAnim .giwL2,
+  .giwAnim .giwL3,
+  .giwAnim .giwL4,
+  .giwAnim .giwR1,
+  .giwAnim .giwR2,
+  .giwAnim .giwR3,
+  .giwAnim .giwR4,
+  .giwAnim .giwPen,
+  .giwAnim .giwSpark1,
+  .giwAnim .giwSpark2,
+  .giwAnim .giwSpark3 { animation: none; }
+}
+
+// === Cel „Twórz bez kursu designu" — scena: sztaluga + płótno + pędzel (analogicznie do „Pisz") ===
+.gipRoot {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+// Pociągnięcia pędzla — domyślnie nienarysowane i niewidoczne (pojawiają się wraz z malowaniem).
+.gipStroke {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+// Wypełnienie malowanego kształtu — domyślnie ukryte, pojawia się po obrysowaniu.
+.gipFill {
+  opacity: 0;
+}
+
+.gipBrush {
+  transform-box: view-box;
+  transform-origin: 120px 100px; // czubek pędzla
+}
+
+.gipSpark {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.5;
+}
+
+.gipGlow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+// Animacje grają tylko w widoku rozwiniętym (.gipAnim). Pełny cykl: 7.5s.
+.gipAnim .gipFloat { animation: giwFloat 6s ease-in-out infinite; }
+.gipAnim .gipGlow { animation: giwGlowPulse 5s ease-in-out infinite; }
+.gipAnim .gip1 { animation: gip1 7.5s ease-in-out infinite; }
+.gipAnim .gipRays { animation: gipRays 7.5s ease-in-out infinite; }
+.gipAnim .gip2 { animation: gip2 7.5s ease-in-out infinite; }
+.gipAnim .gip3 { animation: gip3 7.5s ease-in-out infinite; }
+.gipAnim .gip4 { animation: gip4 7.5s ease-in-out infinite; }
+.gipAnim .gip5 { animation: gip5 7.5s ease-in-out infinite; }
+.gipAnim .gipFill5 { animation: gipFill5 7.5s ease-in-out infinite; }
+.gipAnim .gipBrush { animation: gipBrushPaint 7.5s ease-in-out infinite; }
+.gipAnim .gipSpark1 { animation: giwTwinkle 2.6s ease-in-out infinite; }
+.gipAnim .gipSpark2 { animation: giwTwinkle 2.6s ease-in-out infinite 0.7s; }
+.gipAnim .gipSpark3 { animation: giwTwinkle 2.6s ease-in-out infinite 1.3s; }
+
+// Kolejne pociągnięcia odsłaniają się wraz z ruchem pędzla (jak pismo w „Pisz").
+@keyframes gip1 {
+  0%, 10% { stroke-dashoffset: 1; opacity: 0; }
+  22%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+// Promienie słońca — odsłaniane tuż po okręgu.
+@keyframes gipRays {
+  0%, 22% { stroke-dashoffset: 1; opacity: 0; }
+  27%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gip2 {
+  0%, 26% { stroke-dashoffset: 1; opacity: 0; }
+  33%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gip3 {
+  0%, 37% { stroke-dashoffset: 1; opacity: 0; }
+  47%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gip4 {
+  0%, 51% { stroke-dashoffset: 1; opacity: 0; }
+  60%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gip5 {
+  0%, 64% { stroke-dashoffset: 1; opacity: 0; }
+  70%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+// Wypełnienie korony „rozlewa się" tuż po obrysowaniu.
+@keyframes gipFill5 {
+  0%, 66% { opacity: 0; }
+  75%, 96% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+// Pędzel śledzi kreślone kształty w czasie rzeczywistym: okrąg słońca → łańcuch gór →
+// linia ziemi → pień → obrys korony, a potem powrót do spoczynku.
+@keyframes gipBrushPaint {
+  0%, 6%   { transform: translate(0px, 0px) rotate(0deg); }
+  /* słońce — pędzel obiega okrąg */
+  10% { transform: translate(-8px, -42px) rotate(-10deg); }
+  13% { transform: translate(-2px, -36px) rotate(-10deg); }
+  16% { transform: translate(-8px, -30px) rotate(-10deg); }
+  19% { transform: translate(-14px, -36px) rotate(-10deg); }
+  22% { transform: translate(-8px, -42px) rotate(-10deg); }
+  /* promienie — krótkie dotknięcia wokół słońca */
+  24% { transform: translate(-8px, -34px) rotate(-10deg); }
+  /* góry — pędzel idzie po szczytach */
+  26% { transform: translate(-56px, -4px) rotate(-12deg); }
+  28% { transform: translate(-40px, -28px) rotate(-12deg); }
+  30% { transform: translate(-24px, -6px) rotate(-12deg); }
+  32% { transform: translate(-8px, -30px) rotate(-12deg); }
+  33% { transform: translate(6px, -4px) rotate(-12deg); }
+  /* ziemia — pociągnięcie wzdłuż linii gruntu */
+  37% { transform: translate(-56px, 6px) rotate(-12deg); }
+  42% { transform: translate(-25px, 9px) rotate(-12deg); }
+  47% { transform: translate(6px, 6px) rotate(-12deg); }
+  /* pień — w górę */
+  51% { transform: translate(-38px, 6px) rotate(-16deg); }
+  60% { transform: translate(-38px, -8px) rotate(-16deg); }
+  /* korona — pędzel obrysowuje trójkąt */
+  64% { transform: translate(-38px, -20px) rotate(-12deg); }
+  66% { transform: translate(-47px, -5px) rotate(-12deg); }
+  68% { transform: translate(-29px, -5px) rotate(-12deg); }
+  70% { transform: translate(-38px, -20px) rotate(-12deg); }
+  80%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gipAnim .gipFloat,
+  .gipAnim .gipGlow,
+  .gipAnim .gip1,
+  .gipAnim .gipRays,
+  .gipAnim .gip2,
+  .gipAnim .gip3,
+  .gipAnim .gip4,
+  .gipAnim .gip5,
+  .gipAnim .gipFill5,
+  .gipAnim .gipBrush,
+  .gipAnim .gipSpark1,
+  .gipAnim .gipSpark2,
+  .gipAnim .gipSpark3 { animation: none; }
+}
+
+// === Cel „Twórz transkrypcje" — scena: mikrofon + fale dźwięku + karta transkrypcji ===
+.gtsRoot {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+// Linijki transkrypcji — domyślnie nienarysowane i niewidoczne.
+.gtsLine {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+.gtsWave {
+  transform-box: view-box;
+  transform-origin: 76px 72px; // przy kapsule mikrofonu
+  opacity: 0;
+}
+
+.gtsBar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%; // słupki rosną od dołu
+}
+
+.gtsRec {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.gtsSpark {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.5;
+}
+
+.gtsGlow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+// Animacje grają tylko w widoku rozwiniętym (.gtsAnim). Pełny cykl linijek: 7.5s.
+.gtsAnim .gtsFloat { animation: giwFloat 6s ease-in-out infinite; }
+.gtsAnim .gtsGlow { animation: giwGlowPulse 5s ease-in-out infinite; }
+.gtsAnim .gtsWave1 { animation: gtsWave 2.1s ease-out infinite; }
+.gtsAnim .gtsWave2 { animation: gtsWave 2.1s ease-out infinite 0.55s; }
+.gtsAnim .gtsWave3 { animation: gtsWave 2.1s ease-out infinite 1.1s; }
+.gtsAnim .gtsL1 { animation: gtsL1 7.5s ease-in-out infinite; }
+.gtsAnim .gtsL2 { animation: gtsL2 7.5s ease-in-out infinite; }
+.gtsAnim .gtsL3 { animation: gtsL3 7.5s ease-in-out infinite; }
+.gtsAnim .gtsL4 { animation: gtsL4 7.5s ease-in-out infinite; }
+.gtsAnim .gtsBar1 { animation: gtsBar 0.7s ease-in-out infinite; }
+.gtsAnim .gtsBar2 { animation: gtsBar 0.95s ease-in-out infinite 0.1s; }
+.gtsAnim .gtsBar3 { animation: gtsBar 0.6s ease-in-out infinite 0.2s; }
+.gtsAnim .gtsBar4 { animation: gtsBar 1.1s ease-in-out infinite 0.05s; }
+.gtsAnim .gtsBar5 { animation: gtsBar 0.82s ease-in-out infinite 0.15s; }
+.gtsAnim .gtsRec { animation: gtsRec 1.4s ease-in-out infinite; }
+.gtsAnim .gtsCaret { animation: gtsCaret 1s steps(1, end) infinite; }
+.gtsAnim .gtsSpark1 { animation: giwTwinkle 2.6s ease-in-out infinite; }
+.gtsAnim .gtsSpark2 { animation: giwTwinkle 2.6s ease-in-out infinite 0.7s; }
+.gtsAnim .gtsSpark3 { animation: giwTwinkle 2.6s ease-in-out infinite 1.3s; }
+
+// Fale dźwięku rozchodzą się od mikrofonu (sonar).
+@keyframes gtsWave {
+  0% { opacity: 0; transform: scale(0.5); }
+  18% { opacity: 0.9; }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+// Linijki transkrypcji „wpisują się" jedna po drugiej.
+@keyframes gtsL1 {
+  0%, 12% { stroke-dashoffset: 1; opacity: 0; }
+  24%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gtsL2 {
+  0%, 28% { stroke-dashoffset: 1; opacity: 0; }
+  40%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gtsL3 {
+  0%, 44% { stroke-dashoffset: 1; opacity: 0; }
+  56%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gtsL4 {
+  0%, 60% { stroke-dashoffset: 1; opacity: 0; }
+  72%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+// Słupki poziomu audio (waveform).
+@keyframes gtsBar {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+
+// Pulsująca dioda nagrywania.
+@keyframes gtsRec {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.82); }
+}
+
+// Migający kursor transkrypcji.
+@keyframes gtsCaret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gtsAnim .gtsFloat,
+  .gtsAnim .gtsGlow,
+  .gtsAnim .gtsWave1,
+  .gtsAnim .gtsWave2,
+  .gtsAnim .gtsWave3,
+  .gtsAnim .gtsL1,
+  .gtsAnim .gtsL2,
+  .gtsAnim .gtsL3,
+  .gtsAnim .gtsL4,
+  .gtsAnim .gtsBar1,
+  .gtsAnim .gtsBar2,
+  .gtsAnim .gtsBar3,
+  .gtsAnim .gtsBar4,
+  .gtsAnim .gtsBar5,
+  .gtsAnim .gtsRec,
+  .gtsAnim .gtsCaret,
+  .gtsAnim .gtsSpark1,
+  .gtsAnim .gtsSpark2,
+  .gtsAnim .gtsSpark3 { animation: none; }
+}
+
+// === Cel „Wychodź ze spotkań z gotowymi notatkami" — scena: monitor (wideo) + karta notatek AI ===
+.gtmRoot {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+// Linijki notatek i ptaszki checkboxów — domyślnie nienarysowane i niewidoczne.
+.gtmLine {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+.gtmRing {
+  opacity: 0;
+}
+
+.gtmLive {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.gtmSpark {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.5;
+}
+
+.gtmGlow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+// Animacje grają tylko w widoku rozwiniętym (.gtmAnim). Pełny cykl: 7.5s.
+.gtmAnim .gtmFloat { animation: giwFloat 6s ease-in-out infinite; }
+.gtmAnim .gtmGlow { animation: giwGlowPulse 5s ease-in-out infinite; }
+.gtmAnim .gtmL1 { animation: gtmL1 7.5s ease-in-out infinite; }
+.gtmAnim .gtmL2 { animation: gtmL2 7.5s ease-in-out infinite; }
+.gtmAnim .gtmL3 { animation: gtmL3 7.5s ease-in-out infinite; }
+.gtmAnim .gtmC1 { animation: gtmC1 7.5s ease-in-out infinite; }
+.gtmAnim .gtmC2 { animation: gtmC2 7.5s ease-in-out infinite; }
+.gtmAnim .gtmC3 { animation: gtmC3 7.5s ease-in-out infinite; }
+.gtmAnim .gtmRing1 { animation: gtmSpeak 3.2s ease-in-out infinite; }
+.gtmAnim .gtmRing2 { animation: gtmSpeak 3.2s ease-in-out infinite 0.8s; }
+.gtmAnim .gtmRing3 { animation: gtmSpeak 3.2s ease-in-out infinite 1.6s; }
+.gtmAnim .gtmRing4 { animation: gtmSpeak 3.2s ease-in-out infinite 2.4s; }
+.gtmAnim .gtmLive { animation: gtsRec 1.4s ease-in-out infinite; }
+.gtmAnim .gtmSpark1 { animation: giwTwinkle 2.6s ease-in-out infinite; }
+.gtmAnim .gtmSpark2 { animation: giwTwinkle 2.6s ease-in-out infinite 0.7s; }
+.gtmAnim .gtmSpark3 { animation: giwTwinkle 2.6s ease-in-out infinite 1.3s; }
+
+// Punkty notatek wpisują się po kolei.
+@keyframes gtmL1 {
+  0%, 12% { stroke-dashoffset: 1; opacity: 0; }
+  24%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gtmL2 {
+  0%, 32% { stroke-dashoffset: 1; opacity: 0; }
+  44%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gtmL3 {
+  0%, 52% { stroke-dashoffset: 1; opacity: 0; }
+  64%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+// Ptaszki odhaczane tuż po pojawieniu się danego punktu.
+@keyframes gtmC1 {
+  0%, 22% { stroke-dashoffset: 1; opacity: 0; }
+  30%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gtmC2 {
+  0%, 42% { stroke-dashoffset: 1; opacity: 0; }
+  50%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes gtmC3 {
+  0%, 62% { stroke-dashoffset: 1; opacity: 0; }
+  70%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+// Ramka aktywnego mówcy „wędruje" po kafelkach uczestników.
+@keyframes gtmSpeak {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  22% { opacity: 1; }
+  35%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gtmAnim .gtmFloat,
+  .gtmAnim .gtmGlow,
+  .gtmAnim .gtmL1,
+  .gtmAnim .gtmL2,
+  .gtmAnim .gtmL3,
+  .gtmAnim .gtmC1,
+  .gtmAnim .gtmC2,
+  .gtmAnim .gtmC3,
+  .gtmAnim .gtmRing1,
+  .gtmAnim .gtmRing2,
+  .gtmAnim .gtmRing3,
+  .gtmAnim .gtmRing4,
+  .gtmAnim .gtmLive,
+  .gtmAnim .gtmSpark1,
+  .gtmAnim .gtmSpark2,
+  .gtmAnim .gtmSpark3 { animation: none; }
+}
+
+// === Cel „Analizuj dane bez formuł" — scena: pulpit (słupki + trend + donut) ===
+.gtdRoot {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+// Linia trendu i pierścień — domyślnie nienarysowane i niewidoczne.
+.gtdLine {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+// Słupki rosną od osi (dolnej krawędzi).
+.gtdBar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.gtdDot {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+
+.gtdSpark {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.5;
+}
+
+.gtdGlow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+// Animacje grają tylko w widoku rozwiniętym (.gtdAnim). Pełny cykl: 7.5s.
+.gtdAnim .gtdFloat { animation: giwFloat 6s ease-in-out infinite; }
+.gtdAnim .gtdGlow { animation: giwGlowPulse 5s ease-in-out infinite; }
+.gtdAnim .gtdBar1 { animation: gtdBar1 7.5s ease-in-out infinite; }
+.gtdAnim .gtdBar2 { animation: gtdBar2 7.5s ease-in-out infinite; }
+.gtdAnim .gtdBar3 { animation: gtdBar3 7.5s ease-in-out infinite; }
+.gtdAnim .gtdBar4 { animation: gtdBar4 7.5s ease-in-out infinite; }
+.gtdAnim .gtdBar5 { animation: gtdBar5 7.5s ease-in-out infinite; }
+.gtdAnim .gtdTrend { animation: gtdTrend 7.5s ease-in-out infinite; }
+.gtdAnim .gtdDot { animation: gtdDot 7.5s ease-in-out infinite; }
+.gtdAnim .gtdRing { animation: gtdRing 7.5s ease-in-out infinite; }
+.gtdAnim .gtdSpark1 { animation: giwTwinkle 2.6s ease-in-out infinite; }
+.gtdAnim .gtdSpark2 { animation: giwTwinkle 2.6s ease-in-out infinite 0.7s; }
+.gtdAnim .gtdSpark3 { animation: giwTwinkle 2.6s ease-in-out infinite 1.3s; }
+
+// Słupki wyrastają po kolei i pozostają do końca cyklu.
+@keyframes gtdBar1 {
+  0%, 8% { transform: scaleY(0.05); }
+  16%, 92% { transform: scaleY(1); }
+  100% { transform: scaleY(0.05); }
+}
+@keyframes gtdBar2 {
+  0%, 14% { transform: scaleY(0.05); }
+  22%, 92% { transform: scaleY(1); }
+  100% { transform: scaleY(0.05); }
+}
+@keyframes gtdBar3 {
+  0%, 20% { transform: scaleY(0.05); }
+  28%, 92% { transform: scaleY(1); }
+  100% { transform: scaleY(0.05); }
+}
+@keyframes gtdBar4 {
+  0%, 26% { transform: scaleY(0.05); }
+  34%, 92% { transform: scaleY(1); }
+  100% { transform: scaleY(0.05); }
+}
+@keyframes gtdBar5 {
+  0%, 32% { transform: scaleY(0.05); }
+  40%, 92% { transform: scaleY(1); }
+  100% { transform: scaleY(0.05); }
+}
+
+// Linia trendu rysuje się nad słupkami.
+@keyframes gtdTrend {
+  0%, 42% { stroke-dashoffset: 1; opacity: 0; }
+  58%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+// Punkt na końcu trendu pojawia się i delikatnie pulsuje.
+@keyframes gtdDot {
+  0%, 56% { opacity: 0; transform: scale(0.4); }
+  62% { opacity: 1; transform: scale(1); }
+  80% { transform: scale(1.18); }
+  96% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.4); }
+}
+// Pierścień (donut) dorysowuje się.
+@keyframes gtdRing {
+  0%, 60% { stroke-dashoffset: 1; opacity: 0; }
+  80%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gtdAnim .gtdFloat,
+  .gtdAnim .gtdGlow,
+  .gtdAnim .gtdBar1,
+  .gtdAnim .gtdBar2,
+  .gtdAnim .gtdBar3,
+  .gtdAnim .gtdBar4,
+  .gtdAnim .gtdBar5,
+  .gtdAnim .gtdTrend,
+  .gtdAnim .gtdDot,
+  .gtdAnim .gtdRing,
+  .gtdAnim .gtdSpark1,
+  .gtdAnim .gtdSpark2,
+  .gtdAnim .gtdSpark3 { animation: none; }
+}
+
+// === Cel „Koduj szybciej i lepiej" — scena: edytor kodu (pisanie + AI ghost + check) ===
+.gtcRoot {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+// Wiersze kodu (grupy tokenów) — domyślnie ukryte, wjeżdżają z lewej.
+.gtcRow {
+  transform-box: fill-box;
+  transform-origin: left center;
+  opacity: 0;
+}
+
+// Podpowiedź AI (ghost) i „check" rysują się ze ścieżki.
+.gtcLine {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+.gtcCaret { opacity: 0; }
+
+.gtcSpark {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.5;
+}
+
+.gtcGlow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+// Animacje grają tylko w widoku rozwiniętym (.gtcAnim). Pełny cykl: 7.5s.
+.gtcAnim .gtcFloat { animation: giwFloat 6s ease-in-out infinite; }
+.gtcAnim .gtcGlow { animation: giwGlowPulse 5s ease-in-out infinite; }
+.gtcAnim .gtcRow1 { animation: gtcRow1 7.5s ease-in-out infinite; }
+.gtcAnim .gtcRow2 { animation: gtcRow2 7.5s ease-in-out infinite; }
+.gtcAnim .gtcRow3 { animation: gtcRow3 7.5s ease-in-out infinite; }
+.gtcAnim .gtcRow5 { animation: gtcRow5 7.5s ease-in-out infinite; }
+.gtcAnim .gtcGhost { animation: gtcGhost 7.5s ease-in-out infinite; }
+.gtcAnim .gtcCaret { animation: gtcBlink 1.1s steps(1, end) infinite; }
+.gtcAnim .gtcCheck { animation: gtcCheck 7.5s ease-in-out infinite; }
+.gtcAnim .gtcSpark1 { animation: giwTwinkle 2.6s ease-in-out infinite; }
+.gtcAnim .gtcSpark2 { animation: giwTwinkle 2.6s ease-in-out infinite 0.7s; }
+.gtcAnim .gtcSpark3 { animation: giwTwinkle 2.6s ease-in-out infinite 1.3s; }
+
+// Wiersze kodu pojawiają się po kolei i pozostają do końca cyklu.
+@keyframes gtcRow1 {
+  0%, 8% { opacity: 0; transform: translateX(-6px); }
+  16%, 92% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-6px); }
+}
+@keyframes gtcRow2 {
+  0%, 18% { opacity: 0; transform: translateX(-6px); }
+  26%, 92% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-6px); }
+}
+@keyframes gtcRow3 {
+  0%, 28% { opacity: 0; transform: translateX(-6px); }
+  36%, 92% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-6px); }
+}
+@keyframes gtcRow5 {
+  0%, 56% { opacity: 0; transform: translateX(-6px); }
+  62%, 92% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-6px); }
+}
+// Podpowiedź AI „wpisuje się" sama.
+@keyframes gtcGhost {
+  0%, 38% { stroke-dashoffset: 1; opacity: 0; }
+  54%, 92% { stroke-dashoffset: 0; opacity: 0.85; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+// Migający kursor.
+@keyframes gtcBlink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+// Zielony „check" rysuje się na końcu.
+@keyframes gtcCheck {
+  0%, 64% { stroke-dashoffset: 1; opacity: 0; }
+  76%, 96% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gtcAnim .gtcFloat,
+  .gtcAnim .gtcGlow,
+  .gtcAnim .gtcRow1,
+  .gtcAnim .gtcRow2,
+  .gtcAnim .gtcRow3,
+  .gtcAnim .gtcRow5,
+  .gtcAnim .gtcGhost,
+  .gtcAnim .gtcCaret,
+  .gtcAnim .gtcCheck,
+  .gtcAnim .gtcSpark1,
+  .gtcAnim .gtcSpark2,
+  .gtcAnim .gtcSpark3 { animation: none; }
+}
+
+// ---------- KARUZELA NARZĘDZI (screen 3) ----------
+.carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  padding: 10px 0;
+}
+
+.carouselStage {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  height: 460px;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.toolCard {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 320px;
+  margin-left: -160px;
+  height: 100%;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(28, 26, 58, 0.92), rgba(15, 16, 38, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 70px rgba(5, 6, 20, 0.6);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.55s ease, filter 0.55s ease;
+  transform-style: preserve-3d;
+}
+
+.toolCardActive {
+  cursor: default;
+  border-color: rgba(139, 92, 246, 0.55);
+  box-shadow: 0 36px 90px rgba(40, 30, 110, 0.55);
+}
+
+.toolCardAll {
+  background: linear-gradient(180deg, rgba(40, 30, 90, 0.95), rgba(12, 40, 50, 0.95));
+}
+
+.toolCardBody {
+  height: 100%;
+  padding: 34px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.toolBadge {
+  width: 88px;
+  height: 88px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+}
+
+// Ikona zębatki na kafelku „Wszystkie narzędzia AI".
+.toolGear {
+  width: 52px;
+  height: 52px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+}
+
+// Logo narzędzia (PNG z assets/icons po id) — to samo co w karuzeli szkoleń, bez gradientu.
+.toolLogo {
+  width: 92px;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 92px;
+    height: 92px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.45));
+  }
+
+  .toolLogoFallback { font-size: 40px; color: #fff; }
+}
+
+// Kafelek „Wszystkie narzędzia AI" — cała zawartość wyśrodkowana (tylko ten kafelek).
+.toolCardAll .toolCardBody {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.toolCardAll .toolActions { justify-content: center; }
+
+.toolTagline {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7ee0ff;
+}
+
+.toolName {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.toolDesc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--c-text-dim);
+  flex: 1;
+}
+
+.toolActions {
+  display: flex;
+  gap: 10px;
+}
+
+.toolBtnPrimary,
+.toolBtnGhost {
+  flex: 1;
+  padding: 13px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.toolBtnPrimary {
+  border: 0;
+  color: #0a0a16;
+  background: linear-gradient(100deg, #b39bff, #6ee7ff);
+  box-shadow: 0 10px 26px rgba(110, 160, 255, 0.35);
+}
+
+.toolBtnPrimary:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(110, 160, 255, 0.5); }
+
+.toolBtnGhost {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--c-text);
+}
+
+.toolBtnGhost:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-2px); }
+
+.carouselNav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 200;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.carouselNav:hover {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.6);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.carouselPrev { left: 0; }
+.carouselNext { right: 0; }
+
+.carouselDots {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 26px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease, background 0.2s ease, width 0.2s ease;
+}
+
+.dotActive {
+  width: 26px;
+  border-radius: 6px;
+  background: linear-gradient(100deg, var(--c-accent-from), var(--c-accent-to));
+}
+
+// ---------- STREFA SZKOLEŃ ----------
+.trainingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.trainingCard {
+  --tr-accent: 126, 224, 255;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  padding: 34px 32px;
+  border-radius: 24px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 360px;
+  color: var(--c-text);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+// górny pasek akcentu
+.trainingCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(var(--tr-accent), 0.9), transparent 80%);
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.trainingCardVideo { --tr-accent: 110, 231, 255; }
+.trainingCardPrompts { --tr-accent: 179, 155, 255; }
+
+.trainingCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(var(--tr-accent), 0.55);
+  box-shadow: 0 26px 60px rgba(8, 10, 30, 0.55);
+}
+
+.trainingCard:hover::before { opacity: 1; }
+
+.trainingGlow {
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 80%;
+  height: 100%;
+  background: radial-gradient(closest-side, rgba(var(--tr-accent), 0.32), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.trainingCard:hover .trainingGlow { opacity: 1; }
+
+.trainingTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.trainingIcon {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(var(--tr-accent));
+  background: linear-gradient(135deg, rgba(var(--tr-accent), 0.3), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(var(--tr-accent), 0.4);
+  transition: transform 0.45s cubic-bezier(0.45, 0, 0.25, 1), box-shadow 0.45s ease;
+}
+
+.trainingCard:hover .trainingIcon {
+  transform: scale(1.08) rotate(-3deg);
+  box-shadow: 0 10px 30px rgba(var(--tr-accent), 0.35);
+}
+
+// --- Animacje SVG na hover (osobne dla każdej karty) ---
+.trainingIcon svg path,
+.trainingIcon svg rect {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+// Wszystkie zapętlone animacje obu kart mają WSPÓLNY takt (2.4s) i wspólny
+// moment kulminacji (50%), więc „biją” razem — efekt jest zsynchronizowany.
+// Kursor używa połowy taktu (1.2s) — pozostaje w fazie (mruga 2× na cykl).
+
+// Wideo: ekran spokojnie „oddycha”, trójkąt play miękko pulsuje
+.trainingCardVideo:hover .trainingIcon svg rect {
+  animation: szScreenPulse 2.4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+.trainingCardVideo:hover .trainingIcon svg path {
+  animation: szPlayPulse 2.4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+
+// Prompty: znak „>” płynnie przesuwa się jak pisanie, dolna linia mruga jak kursor
+.trainingCardPrompts:hover .trainingIcon svg path:nth-of-type(1) {
+  animation: szChevron 2.4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+.trainingCardPrompts:hover .trainingIcon svg path:nth-of-type(2) {
+  animation: szCursorBlink 1.2s ease-in-out infinite;
+}
+
+@keyframes szPlayPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.16); }
+}
+
+@keyframes szScreenPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.78; }
+}
+
+@keyframes szChevron {
+  0%, 100% { transform: translateX(-1px); }
+  50% { transform: translateX(2.5px); }
+}
+
+@keyframes szCursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.12; }
+}
+
+// --- Efekty „wow” poza grafikami (subtelne, premium) ---
+
+// Rozchodzący się pierścień światła wokół ikony
+.trainingIcon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(var(--tr-accent), 0.45);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.trainingCard:hover .trainingIcon::after {
+  animation: szHalo 2.4s ease-in-out infinite;
+}
+
+// Oddech pierścienia: niewidoczny przy krawędzi ikony (start/koniec pętli),
+// rozszerza się i pojawia do szczytu w 50% (zgrane z pulsem), po czym wraca
+// tą samą ścieżką. Dzięki opacity:0 na granicach pętla jest niewidoczna.
+@keyframes szHalo {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 0.18; transform: scale(1.4); }
+}
+
+// Delikatny „shine” przesuwający się przez kartę raz przy najechaniu
+.trainingCard::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -70%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.07) 45%,
+    rgba(var(--tr-accent), 0.1) 55%,
+    transparent
+  );
+  transform: skewX(-16deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.trainingCard:hover::after {
+  animation: szShine 1.15s cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+@keyframes szShine {
+  0% { left: -70%; opacity: 0; }
+  18% { opacity: 1; }
+  100% { left: 130%; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trainingCardVideo:hover .trainingIcon svg rect,
+  .trainingCardVideo:hover .trainingIcon svg path,
+  .trainingCardPrompts:hover .trainingIcon svg path:nth-of-type(1),
+  .trainingCardPrompts:hover .trainingIcon svg path:nth-of-type(2),
+  .trainingCard:hover .trainingIcon::after,
+  .trainingCard:hover::after {
+    animation: none;
+  }
+}
+
+.trainingBadge {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(var(--tr-accent));
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(var(--tr-accent), 0.12);
+  border: 1px solid rgba(var(--tr-accent), 0.35);
+}
+
+.trainingTitle { font-size: 24px; font-weight: 800; }
+
+.trainingDesc {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--c-text-dim);
+}
+
+.trainingBullets {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.trainingBullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--c-text);
+}
+
+.trainingBulletIcon {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(var(--tr-accent));
+  background: rgba(var(--tr-accent), 0.14);
+  border: 1px solid rgba(var(--tr-accent), 0.32);
+}
+
+.trainingTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.trainingTag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.trainingCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(var(--tr-accent));
+  transition: gap 0.25s ease;
+}
+
+.trainingCard:hover .trainingCta { gap: 14px; }
+
+// ---------- BOOKING & POLICY ----------
+.bookingGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  align-items: stretch;
+}
+
+.bookingCard {
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(140deg, rgba(124, 58, 237, 0.35), rgba(34, 211, 238, 0.18));
+  color: var(--c-text);
+  min-height: 320px;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.bookingCard:hover {
+  transform: translateY(-6px) scale(1.005);
+  box-shadow: 0 30px 70px rgba(60, 40, 140, 0.5);
+}
+
+.bookingOrb,
+.bookingOrb2 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.bookingOrb {
+  width: 240px;
+  height: 240px;
+  top: -80px;
+  right: -60px;
+  background: radial-gradient(closest-side, rgba(178, 150, 255, 0.55), transparent 70%);
+  animation: orbFloat 7s ease-in-out infinite;
+}
+
+.bookingOrb2 {
+  width: 200px;
+  height: 200px;
+  bottom: -70px;
+  left: -50px;
+  background: radial-gradient(closest-side, rgba(110, 231, 255, 0.45), transparent 70%);
+  animation: orbFloat 9s ease-in-out infinite reverse;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(18px, 24px); }
+}
+
+.bookingContent {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  padding: 36px 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bookingTitle {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.bookingDesc {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(238, 241, 255, 0.85);
+  flex: 1;
+}
+
+.bookingGo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  align-self: flex-start;
+  padding: 14px 26px;
+  border-radius: 999px;
+  background: #fff;
+  color: #16103a;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  transition: gap 0.25s ease, transform 0.25s ease;
+}
+
+.bookingCard:hover .bookingGo { gap: 18px; transform: translateX(4px); }
+
+.policyCard {
+  padding: 36px 34px;
+  border-radius: 24px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.policyTitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+
+.policyList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.policyItem {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--c-text-dim);
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: policyIn 0.5s ease forwards;
+}
+
+@keyframes policyIn {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.policyIcon {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.policyText { padding-top: 5px; }
+
+.policyLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  background-image: linear-gradient(100deg, #b39bff, #6ee7ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  transition: gap 0.25s ease;
+}
+
+.policyLink svg { color: #6ee7ff; }
+.policyLink:hover { gap: 14px; }
+
+// ---------- PASEK NAWIGACYJNY (sticky) ----------
+.navBar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 64px;
+  padding: 0 22px;
+  background: rgba(10, 10, 22, 0.55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.navLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.navBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--c-text);
+  white-space: nowrap;
+}
+
+.navBrandLogo {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  display: block;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.45));
+}
+
+.navBarLinks {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.navBarLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text-dim);
+  white-space: nowrap;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.navBarLink:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
+
+.navBarLinkActive {
+  color: #fff;
+  background: rgba(139, 92, 246, 0.16);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.navBarLinkIndex {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #7ee0ff;
+}
+
+.navBarCta {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0a0a16;
+  white-space: nowrap;
+  background: linear-gradient(100deg, #b39bff, #6ee7ff);
+  box-shadow: 0 8px 22px rgba(110, 160, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
+}
+
+.navBarCta:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(110, 160, 255, 0.5); }
+
+// ---------- TOOLBAR: WYSZUKIWARKA + TAGI ----------
+.toolsToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 0 auto 30px;
+  max-width: 880px;
+}
+
+.searchBox {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  height: 46px;
+  min-width: 260px;
+  border-radius: 999px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  backdrop-filter: blur(10px);
+  color: var(--c-text-faint);
+  transition: border-color 0.2s ease;
+}
+
+.searchBox:focus-within { border-color: rgba(139, 92, 246, 0.55); }
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--c-text);
+}
+
+.searchInput::placeholder { color: var(--c-text-faint); }
+
+.searchClear {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--c-text-faint);
+  font-size: 20px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.searchClear:hover { color: #fff; }
+
+.tagFilter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tagChip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.tagChip:hover { transform: translateY(-2px); color: #fff; }
+
+.tagChipActive {
+  color: #0a0a16;
+  background: linear-gradient(100deg, #b39bff, #6ee7ff);
+  border-color: transparent;
+}
+
+.toolsEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 20px;
+  color: var(--c-text-dim);
+}
+
+.toolsEmpty .toolBtnGhost { flex: 0 0 auto; min-width: 160px; }
+
+// tagi na kafelku narzędzia
+.toolTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.toolTag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+// ---------- FOOTER ----------
+.appFooter {
+  padding: 40px 24px 56px;
+  text-align: center;
+  scroll-snap-align: end;
+}
+
+// ---------------------------------------------------------------------------
+// RESPONSYWNOŚĆ
+// ---------------------------------------------------------------------------
+@media (max-width: 920px) {
+  .goalGrid { grid-template-columns: repeat(2, 1fr); }
+  .trainingGrid { grid-template-columns: 1fr; }
+  .bookingGrid { grid-template-columns: 1fr; }
+  .navBarLinks { display: none; }
+}
+
+@media (max-width: 600px) {
+  .goalGrid { grid-template-columns: 1fr; }
+  .carouselStage { max-width: 320px; }
+  .toolCard { width: 270px; margin-left: -135px; }
+  .carouselPrev { left: -6px; }
+  .carouselNext { right: -6px; }
+  .section { padding: 70px 16px; }
+  .navBarCta { display: none; }
+  .searchBox { min-width: 100%; }
+}
+
+// =============================================================================
+// VIDEO TRAINING CAROUSEL — hero coverflow (otwierany z kafelka „Szkolenia Wideo")
+// =============================================================================
+.vtcOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999995;
+  overflow: hidden;
+  color: #fff;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #05070f;
+}
+
+.vtcBgs {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.vtcScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    linear-gradient(90deg, rgba(6, 9, 20, 0.6) 0%, rgba(6, 9, 20, 0.32) 42%, rgba(6, 9, 20, 0) 72%),
+    linear-gradient(0deg, rgba(6, 9, 20, 0.62) 0%, rgba(6, 9, 20, 0) 40%);
+}
+
+.vtcGrain {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  opacity: 0.5;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 3px 3px;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.vtcClose {
+  position: absolute;
+  top: 26px;
+  right: 30px;
+  z-index: 20;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(8, 11, 22, 0.6);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    transform: rotate(90deg);
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+// Pasek wyszukiwania narzędzia — górny, wyśrodkowany „pill" nad karuzelą.
+.vtcSearch {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(460px, 72vw);
+  padding: 8px 8px 8px 16px;
+  border-radius: 999px;
+  background: rgba(10, 14, 28, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.vtcSearch:focus-within {
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(139, 92, 246, 0.18);
+}
+.vtcSearchIcon { color: rgba(255, 255, 255, 0.55); flex: 0 0 auto; }
+.vtcSearchInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 15px;
+  font-family: inherit;
+}
+.vtcSearchInput::placeholder { color: rgba(255, 255, 255, 0.45); }
+.vtcSearchGo {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, #4c8dff, #a855f7);
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.vtcSearchGo:hover { transform: scale(1.06); filter: brightness(1.08); }
+// Brak trafienia — czerwony akcent + krótkie „potrząśnięcie".
+.vtcSearchNotFound {
+  border-color: rgba(255, 90, 90, 0.7);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(255, 90, 90, 0.18);
+  animation: vtcSearchShake 0.32s ease;
+}
+@keyframes vtcSearchShake {
+  0%, 100% { transform: translateX(-50%); }
+  25% { transform: translateX(calc(-50% - 5px)); }
+  75% { transform: translateX(calc(-50% + 5px)); }
+}
+
+.vtcMain {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;   // scena wyśrodkowana — brak rozjeżdżania na szerokich oknach
+  box-sizing: border-box;
+}
+
+// Stała, ograniczona scena — content + kolejka trzymają się razem niezależnie od okna.
+.vtcStage {
+  width: 100%;
+  max-width: 1640px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 120px;
+  padding: 0 clamp(24px, 2.5vw, 40px);
+  box-sizing: border-box;
+}
+
+.vtcContent {
+  max-width: 480px;
+  flex: 1 1 auto;
+}
+
+// Scena dwuwarstwowa — stary i nowy content nakładają się i krzyżowo wymieniają.
+.vtcContentStage {
+  position: relative;
+  align-self: stretch;
+  flex: 1 1 auto;
+  max-width: 540px;
+  display: flex;
+}
+
+.vtcContentLayer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 540px;
+  will-change: opacity, transform, filter;
+  pointer-events: none; // przezroczysta dla zdarzeń — nie blokuje hovera kolejki (klikalny tylko CTA)
+}
+
+.vtcEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: 18px;
+}
+
+.vtcEyebrowLine {
+  width: 38px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+}
+
+.vtcTitle {
+  margin: 0 0 18px;
+  font-size: clamp(44px, 4.4vw, 68px);
+  line-height: 0.98;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-shadow: 0 14px 50px rgba(0, 0, 0, 0.5);
+}
+
+.vtcDesc {
+  margin: 0 0 30px;
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 440px;
+}
+
+.vtcCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 26px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto; // warstwa treści jest „przezroczysta" dla zdarzeń, ale przycisk ma działać
+  font-size: 15px;
+  font-weight: 600;
+  color: #0a0f1e;
+  background: #fff;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  svg { transition: transform 0.2s ease; }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 54px rgba(0, 0, 0, 0.45);
+  }
+
+  &:hover svg { transform: translateX(4px); }
+}
+
+// logo na aktywnym slajdzie — kafelek-tile w gradiencie narzędzia
+.vtcLogo {
+  width: 112px;
+  height: 112px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  color: #fff;
+
+  // Logo głównej sekcji = w całości ilustracja aplikacji (bez tła/gradientu).
+  img { width: 112px; height: 112px; object-fit: contain; display: block; filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.5)); }
+  svg { width: 64px; height: 64px; }
+}
+
+.toolLogoFallback {
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.02em;
+}
+
+.vtcQueue {
+  position: relative;
+  z-index: 3;                     // kolejka zawsze NAD warstwą treści (hover/klik kart pewny)
+  flex: 0 0 auto;
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  align-self: flex-end;          // przy dole, nie na środku
+  margin-bottom: 150px;           // wyraźnie nad paskiem postępu/sterowaniem
+}
+
+// Okno taśmy — pokazuje 4 pełne sloty + po feather‑ze (28px) z każdej strony.
+// Zamiast twardego cięcia stosujemy miękką maskę: karty poza kadrem oraz te
+// wjeżdżające/wyjeżdżające płynnie się rozmywają (brak „ucięć”). Maska powtarza
+// się w pionie, więc hover (uniesienie + cień) nie jest przycinany.
+.vtcQueueViewport {
+  width: calc(4 * 200px + 5 * 28px);   // 4 karty + 3 odstępy + 2 feathery
+  overflow: visible;
+  // Pionowy zapas (padding) mieści uniesienie i cień przy hover; ujemny margines
+  // nie psuje układu. Maska tylko POZIOMA (pełna wysokość) — nic nie ucina u góry.
+  padding: 90px 0;
+  margin: -90px 0;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+          mask-image: linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+  -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  pointer-events: none; // tylko karty łapią zdarzenia (rząd rozciąga się poza kadr — nie może przechwytywać)
+}
+
+.vtcQueueLabel {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  padding-left: 4px;
+}
+
+.vtcQueueRow {
+  display: flex;
+  gap: 28px;
+  width: max-content;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.vtcCard {
+  position: relative;
+  width: 200px;
+  height: 288px;
+  flex: 0 0 auto;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: transparent;                 // przezroczyste tło — widać konstelację
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+  box-shadow: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+
+  &:hover {
+    transform: translateY(-6px);          // subtelne, jednakowe uniesienie (bez skalowania)
+    border-color: rgba(255, 255, 255, 0.38);
+    background: rgba(255, 255, 255, 0.06); // delikatne podświetlenie
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.36);
+  }
+}
+
+.vtcCardScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(6, 9, 20, 0.82) 0%, rgba(6, 9, 20, 0.12) 52%, rgba(6, 9, 20, 0.28) 100%);
+}
+
+.vtcCardLogo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+
+  svg { width: 60px; height: 60px; filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.45)); opacity: 0.96; }
+  img { width: 88px; height: 88px; object-fit: contain; display: block; filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.5)); }
+
+  .toolLogoFallback { font-size: 34px; }
+}
+
+.vtcCardMeta {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+}
+
+.vtcCardTagline {
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+.vtcCardName {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.12;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75);
+}
+
+.vtcControls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 40px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  padding: 0 clamp(28px, 6vw, 96px);
+  box-sizing: border-box;
+}
+
+.vtcArrows {
+  display: flex;
+  gap: 12px;
+}
+
+.vtcArrow {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(12, 16, 28, 0.4);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.08);
+  }
+}
+
+.vtcProgress {
+  flex: 1 1 auto;
+  max-width: 420px;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+}
+
+.vtcProgressFill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.vtcCounter {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+.vtcCounterCur {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.vtcCounterSep {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.vtcCounterTotal {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@media (min-width: 1280px) {
+  .vtcQueue { display: flex; }
+}
+
+@media (max-width: 600px) {
+  .vtcClose { top: 16px; right: 16px; }
+  .vtcControls { gap: 16px; bottom: 26px; }
+  .vtcCounterCur { font-size: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcomeStage,
+  .explode,
+  .bgGlow,
+  .pillDot,
+  .scrollCaret,
+  .bookingOrb,
+  .bookingOrb2,
+  .policyItem {
+    animation: none !important;
+  }
+}
+
+.peOverlay {
+  // portal renderuje do <body> (poza .app) — zmienne akcentu muszą być tutaj,
+  // inaczej gradienty (przyciski, kropki, nazwa) są niewidoczne.
+  --c-accent-from: #8b5cf6;
+  --c-accent-to: #22d3ee;
+  position: fixed;
+  inset: 0;
+  z-index: 999996;
+  overflow: hidden;
+  color: #fff;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #05070f;
+}
+
+.peStage {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 5vw, 90px);
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 64px);
+  box-sizing: border-box;
+}
+
+.peDialog {
+  flex: 1 1 560px;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.peSpeech {
+  position: relative;
+  border-radius: 22px;
+  padding: 24px 26px 30px;
+  background: linear-gradient(160deg, rgba(20, 26, 52, 0.72), rgba(10, 14, 30, 0.62));
+  border: 1px solid rgba(139, 156, 255, 0.28);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+}
+
+.peSpeechHead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.peSpeechName {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  background: linear-gradient(100deg, var(--c-accent-from), var(--c-accent-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.peSpeechRole {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.peSpeechBody {
+  min-height: 150px;
+}
+
+.peSpeechText {
+  margin: 0 0 10px;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.62;
+  color: rgba(238, 242, 255, 0.92);
+}
+
+.peCaret {
+  display: inline-block;
+  width: 9px;
+  height: 1.05em;
+  margin-left: 3px;
+  transform: translateY(2px);
+  border-radius: 2px;
+  background: var(--c-accent-to);
+  animation: peBlink 0.9s steps(1) infinite;
+}
+
+@keyframes peBlink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+.peSkipHint {
+  position: absolute;
+  right: 20px;
+  bottom: 11px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+.peOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.peOptions[data-ready='true'] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.peChooseHint {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 2px;
+}
+
+.peOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(139, 156, 255, 0.22);
+  color: #eef2ff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.peOption:hover {
+  transform: translateX(4px);
+  background: rgba(139, 156, 255, 0.14);
+  border-color: rgba(139, 156, 255, 0.5);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+}
+
+.peOption:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.peOptionDot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-accent-from), var(--c-accent-to));
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.7);
+}
+
+.peOptionExit {
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.peOptionExit .peOptionDot {
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: none;
+}
+.peAvatarWrap {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(300px, 35vw, 470px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.peAvatarSvg {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.peAvatarGlow {
+  position: absolute;
+  z-index: 1;
+  width: 82%;
+  height: 82%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.32), rgba(139, 92, 246, 0.12) 55%, transparent 72%);
+  filter: blur(20px);
+  animation: pePulseGlow 4s ease-in-out infinite;
+}
+
+@keyframes pePulseGlow {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+.peRobot {
+  width: 100%;
+  height: auto;
+}
+
+.peRobotFloat {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: peFloat 4.2s ease-in-out infinite;
+}
+
+@keyframes peFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.peRobotShadow {
+  animation: peShadow 4.2s ease-in-out infinite;
+}
+
+@keyframes peShadow {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.2; }
+}
+.peRobotAntenna,
+.peRobotAntennaGlow,
+.peRobotCore,
+.peRobotCoreGlow,
+.peRobotEyes,
+.peRobotMouth,
+.peRobotArm {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+// ramię obraca się wokół barku (góra grupy), nie środka — naturalne machanie
+.peRobotArm {
+  transform-origin: 50% 0%;
+}
+
+.peRobotAntenna { animation: peAnt 2.4s ease-in-out infinite; }
+@keyframes peAnt {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+.peRobotAntennaGlow { animation: peAntGlow 2.4s ease-in-out infinite; }
+@keyframes peAntGlow {
+  0%, 100% { opacity: 0.25; transform: scale(0.9); }
+  50% { opacity: 0.55; transform: scale(1.18); }
+}
+
+.peRobotCore { animation: peCore 2.8s ease-in-out infinite; }
+@keyframes peCore {
+  0%, 100% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+
+.peRobotCoreGlow { animation: peCoreGlow 2.8s ease-in-out infinite; }
+@keyframes peCoreGlow {
+  0%, 100% { opacity: 0.3; transform: scale(0.95); }
+  50% { opacity: 0.5; transform: scale(1.12); }
+}
+
+.peRobotEyes { animation: peEyeBlink 5s infinite; }
+@keyframes peEyeBlink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.12); }
+}
+
+.peRobotTalking .peRobotEyes { animation: peEyeBlink 2.8s infinite; }
+.peRobotTalking .peRobotMouth { animation: peTalk 0.42s ease-in-out infinite; }
+@keyframes peTalk {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1.9); }
+}
+
+// pożegnanie: ramię unosi się PIONOWO w górę, obok głowy (blisko ciała),
+// i tam wykonuje gest machania, po czym zostaje uniesione.
+.peRobotBye .peRobotArm { animation: peWave 2.4s cubic-bezier(0.33, 1, 0.68, 1) forwards; }
+.peRobotBye .peRobotMouth { animation: peTalk 0.5s ease-in-out infinite; }
+@keyframes peWave {
+  0% { transform: rotate(0deg); }
+  22% { transform: rotate(-168deg); }
+  34% { transform: rotate(-152deg); }
+  46% { transform: rotate(-184deg); }
+  58% { transform: rotate(-154deg); }
+  70% { transform: rotate(-182deg); }
+  82% { transform: rotate(-160deg); }
+  100% { transform: rotate(-168deg); }
+}
+// Powitanie — ta sama mechanika co pożegnanie, ale ręka po kilku machnięciach
+// wraca płynnie do pozycji wyjściowej (stojącej, rotate 0). Bez `forwards`.
+.peRobotHello .peRobotArm { animation: peWaveHello 2.8s cubic-bezier(0.33, 1, 0.68, 1) 1; }
+@keyframes peWaveHello {
+  0% { transform: rotate(0deg); }
+  16% { transform: rotate(-168deg); }
+  27% { transform: rotate(-152deg); }
+  38% { transform: rotate(-184deg); }
+  49% { transform: rotate(-154deg); }
+  60% { transform: rotate(-182deg); }
+  71% { transform: rotate(-158deg); }
+  82% { transform: rotate(-168deg); }
+  100% { transform: rotate(0deg); }
+}
+.peSoundToggle {
+  position: absolute;
+  top: 26px;
+  right: 88px;
+  z-index: 20;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(8, 11, 22, 0.6);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.peSoundToggle:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.peSoundOn {
+  color: #22d3ee;
+  border-color: rgba(34, 211, 238, 0.7);
+  box-shadow: 0 0 22px rgba(34, 211, 238, 0.4);
+}
+
+.peNotice {
+  position: absolute;
+  left: 50%;
+  bottom: 34px;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: min(640px, 92vw);
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, rgba(20, 26, 52, 0.92), rgba(10, 14, 30, 0.85));
+  border: 1px solid rgba(139, 156, 255, 0.32);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.peNoticeIcon { display: flex; color: #22d3ee; }
+
+.peNoticeBody { display: flex; flex-direction: column; gap: 2px; }
+
+.peNoticeTitle { font-weight: 800; font-size: 14px; }
+
+.peNoticeText { font-size: 13px; color: rgba(255, 255, 255, 0.7); }
+
+.peNoticeActions { display: flex; gap: 8px; margin-left: 6px; }
+
+.peNoticeBtn {
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  color: #06121e;
+  background: linear-gradient(100deg, var(--c-accent-from), var(--c-accent-to));
+  box-shadow: 0 8px 20px rgba(34, 211, 238, 0.3);
+}
+
+.peNoticeBtn:hover { filter: brightness(1.08); }
+
+.peNoticeGhost {
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.peNoticeGhost:hover { background: rgba(255, 255, 255, 0.08); }
+
+@media (max-width: 900px) {
+  .peStage { flex-direction: column-reverse; gap: 14px; }
+  .peAvatarWrap { width: clamp(210px, 50vw, 300px); }
+  .peDialog { flex: 0 1 auto; max-width: 94vw; width: 100%; }
+  .peSpeechBody { min-height: 120px; }
+  .peSoundToggle { top: 16px; right: 76px; }
+  .peNotice { flex-direction: column; text-align: center; bottom: 18px; gap: 10px; }
+  .peNoticeActions { margin-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peRobotFloat,
+  .peRobotShadow,
+  .peRobotAntenna,
+  .peRobotAntennaGlow,
+  .peRobotCore,
+  .peRobotCoreGlow,
+  .peRobotEyes,
+  .peRobotMouth,
+  .peRobotArm,
+  .peAvatarGlow,
+  .peCaret {
+    animation: none !important;
+  }
+}

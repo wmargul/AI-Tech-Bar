@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "ai-tech-bar-client-side-solution",
+    "id": "ec812fbd-50d2-42d1-ab7f-67197bdf8bfb",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.22.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "ai-tech-bar description"
+      },
+      "longDescription": {
+        "default": "ai-tech-bar description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "ai-tech-bar Feature",
+        "description": "The feature that activates elements of the ai-tech-bar solution.",
+        "id": "618549a2-6c6f-44d6-8dd1-5634feb908f2",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/ai-tech-bar.sppkg"
+  }
+}

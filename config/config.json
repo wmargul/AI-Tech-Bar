@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "ai-tech-bar-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/aiTechBar/AiTechBarWebPart.js",
+          "manifest": "./src/webparts/aiTechBar/AiTechBarWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "AiTechBarWebPartStrings": "lib/webparts/aiTechBar/loc/{locale}.js"
+  }
+}
