@@ -171,7 +171,8 @@ export default class AiTechBarWebPart extends BaseClientSideWebPart<IAiTechBarWe
                 PropertyPaneTextField('linkPolicy', { label: 'Pełna Polityka AI' }),
                 PropertyPaneTextField('linkAllTools', { label: 'Pełna lista narzędzi' }),
                 PropertyPaneTextField('linkVideoTraining', { label: 'Szkolenia Wideo' }),
-                PropertyPaneTextField('linkPrompts', { label: 'Prompty & Triki' })
+                PropertyPaneTextField('linkPrompts', { label: 'Prompty & Triki' }),
+                PropertyPaneTextField('linkNews', { label: 'Wszystkie aktualności (News)' })
               ]
             },
             {

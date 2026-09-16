@@ -13,10 +13,20 @@ import NavigationHero from './sections/NavigationHero';
 import CelSection from './sections/CelSection';
 import ToolsCarousel from './sections/ToolsCarousel';
 import StrefaSzkolen from './sections/StrefaSzkolen';
-import BookingPolicy from './sections/BookingPolicy';
+import BookingSection from './sections/BookingSection';
+import PolicySection from './sections/PolicySection';
+import NewsSection from './sections/NewsSection';
 
 // Kolejność paneli full-page (jeden gest scrolla = jeden panel).
-const SECTION_ORDER = ['sec-hero', 'sec-szkolenia', 'sec-cel', 'sec-tools', 'sec-booking'];
+const SECTION_ORDER = [
+  'sec-hero',
+  'sec-szkolenia',
+  'sec-cel',
+  'sec-tools',
+  'sec-booking',
+  'sec-news',
+  'sec-policy'
+];
 
 const getFirstName = (displayName: string): string => {
   if (!displayName) return 'Gościu';
@@ -327,7 +337,9 @@ const AiTechBar: React.FC<IAiTechBarProps> = (props) => {
           <StrefaSzkolen settings={settings} />
           <CelSection onSelectGoal={scrollToSection} />
           <ToolsCarousel settings={settings} />
-          <BookingPolicy settings={settings} />
+          <BookingSection settings={settings} />
+          <NewsSection settings={settings} />
+          <PolicySection settings={settings} />
         </div>
       </div>
 

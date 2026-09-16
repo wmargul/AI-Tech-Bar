@@ -12,6 +12,7 @@ export interface ITitleParts { pre: string; grad: string; post: string; }
 export interface IWelcomeWord { chars: string; gradient: boolean; }
 export interface IToolText { name?: string; tagline: string; description: string; tags: string[]; singleButtonLabel?: string; }
 export interface IGoalText { title: string; tools: string; }
+export interface INewsText { tag: string; title: string; excerpt: string; }
 
 export interface IStrings {
   welcome: {
@@ -50,13 +51,21 @@ export interface IStrings {
   booking: {
     kicker: string; title: ITitleParts; lead: string;
     bookingPill: string; bookingTitle: string; bookingDesc: string; bookingGo: string;
+  };
+  policy: {
+    kicker: string; title: ITitleParts; lead: string;
     policyTitle: string; policyLink: string;
+  };
+  news: {
+    kicker: string; title: ITitleParts; lead: string;
+    readCta: string; allCta: string;
   };
   navbar: { brand: string; cta: string; };
   fs: { label: string; hint: string; cta: string; };
   lang: { label: string; switchTo: string; };
   toolText: { [id: string]: IToolText };
   goalText: { [id: string]: IGoalText };
+  newsText: { [id: string]: INewsText };
   policyRules: string[];
 }
 
@@ -87,7 +96,9 @@ const PL: IStrings = {
       'sec-szkolenia': 'Strefa Szkoleń',
       'sec-cel': 'Cel',
       'sec-tools': 'Narzędzia AI',
-      'sec-booking': 'Tech Bar & Polityka'
+      'sec-booking': 'Tech Bar',
+      'sec-news': 'News',
+      'sec-policy': 'Polityka AI'
     }
   },
   szkolenia: {
@@ -140,15 +151,27 @@ const PL: IStrings = {
     clearFilters: 'Wyczyść filtry'
   },
   booking: {
-    kicker: '#04 · Tech Bar & Polityka',
+    kicker: '#04 · Tech Bar',
     title: { pre: 'Wpadnij do ', grad: 'AI Tech Bar', post: '' },
-    lead: 'Zarezerwuj sesję 1:1 z ekspertem i poznaj zasady bezpiecznego korzystania z AI.',
+    lead: 'Zarezerwuj sesję 1:1 z ekspertem i wyjdź z gotowym planem wdrożenia AI w swojej pracy.',
     bookingPill: 'Booking',
     bookingTitle: 'Zarezerwuj wizytę w AI Tech Bar',
     bookingDesc: 'Indywidualna sesja z ekspertem AI — pokażemy, jak wdrożyć narzędzia w Twojej codziennej pracy.',
-    bookingGo: 'Przejdź',
+    bookingGo: 'Przejdź'
+  },
+  policy: {
+    kicker: '#06 · Polityka AI',
+    title: { pre: 'Korzystaj z AI ', grad: 'bezpiecznie', post: '' },
+    lead: 'Cztery zasady, które chronią Ciebie i firmę. Poznaj je, zanim zaczniesz pracę z narzędziami AI.',
     policyTitle: 'Zasady korzystania z AI',
     policyLink: 'Przeczytaj pełną Politykę AI'
+  },
+  news: {
+    kicker: '#05 · News',
+    title: { pre: 'Co ', grad: 'nowego', post: ' w AI' },
+    lead: 'Wdrożenia, nowe narzędzia i zmiany w zasadach — wszystko, co warto wiedzieć na bieżąco.',
+    readCta: 'Czytaj więcej',
+    allCta: 'Zobacz wszystkie aktualności'
   },
   navbar: { brand: 'AI Tech Bar', cta: 'Zarezerwuj wizytę' },
   fs: {
@@ -209,6 +232,23 @@ const PL: IStrings = {
     'goal-data': { title: 'Analizuj dane bez formuł', tools: 'Copilot M365' },
     'goal-code': { title: 'Koduj szybciej i lepiej', tools: 'GitHub Copilot · Cursor' }
   },
+  newsText: {
+    'news-copilot-rollout': {
+      tag: 'Wdrożenie',
+      title: 'Copilot M365 dostępny dla kolejnych zespołów',
+      excerpt: 'Rozszerzamy dostęp do Copilota w Word, Excel, Outlook i Teams. Sprawdź, jak złożyć wniosek i od czego zacząć.'
+    },
+    'news-prompt-library': {
+      tag: 'Biblioteka',
+      title: 'Nowa paczka promptów dla zespołów',
+      excerpt: 'Gotowe prompty do raportów, podsumowań spotkań i analizy danych — skopiuj i użyj od razu w swojej pracy.'
+    },
+    'news-policy-update': {
+      tag: 'Polityka AI',
+      title: 'Aktualizacja zasad korzystania z AI',
+      excerpt: 'Doprecyzowaliśmy reguły dotyczące danych poufnych i weryfikacji wyników. Zapoznaj się z nową wersją polityki.'
+    }
+  },
   policyRules: [
     'Traktuj AI jako pomocnika — ostateczna decyzja i odpowiedzialność zawsze należą do Ciebie.',
     'Nie wprowadzaj do narzędzi AI danych osobowych (klientów, pracowników, partnerów), informacji poufnych ani tajemnic firmy.',
@@ -244,7 +284,9 @@ const EN: IStrings = {
       'sec-szkolenia': 'Training Zone',
       'sec-cel': 'Goal',
       'sec-tools': 'AI Tools',
-      'sec-booking': 'Tech Bar & Policy'
+      'sec-booking': 'Tech Bar',
+      'sec-news': 'News',
+      'sec-policy': 'AI Policy'
     }
   },
   szkolenia: {
@@ -297,15 +339,27 @@ const EN: IStrings = {
     clearFilters: 'Clear filters'
   },
   booking: {
-    kicker: '#04 · Tech Bar & Policy',
+    kicker: '#04 · Tech Bar',
     title: { pre: 'Drop by the ', grad: 'AI Tech Bar', post: '' },
-    lead: 'Book a 1:1 session with an expert and learn the rules of safe AI use.',
+    lead: 'Book a 1:1 session with an expert and leave with a ready plan for using AI in your work.',
     bookingPill: 'Booking',
     bookingTitle: 'Book a visit to the AI Tech Bar',
     bookingDesc: "A one-on-one session with an AI expert — we'll show you how to apply the tools in your daily work.",
-    bookingGo: 'Go',
+    bookingGo: 'Go'
+  },
+  policy: {
+    kicker: '#06 · AI Policy',
+    title: { pre: 'Use AI ', grad: 'safely', post: '' },
+    lead: 'Four rules that protect you and the company. Get to know them before you start working with AI tools.',
     policyTitle: 'AI usage rules',
     policyLink: 'Read the full AI Policy'
+  },
+  news: {
+    kicker: '#05 · News',
+    title: { pre: "What's ", grad: 'new', post: ' in AI' },
+    lead: 'Rollouts, new tools and policy changes — everything worth knowing, as it happens.',
+    readCta: 'Read more',
+    allCta: 'See all news'
   },
   navbar: { brand: 'AI Tech Bar', cta: 'Book a visit' },
   fs: {
@@ -365,6 +419,23 @@ const EN: IStrings = {
     'goal-meetings': { title: 'Leave meetings with ready notes', tools: 'Zoom AI' },
     'goal-data': { title: 'Analyze data without formulas', tools: 'Copilot M365' },
     'goal-code': { title: 'Code faster and better', tools: 'GitHub Copilot · Cursor' }
+  },
+  newsText: {
+    'news-copilot-rollout': {
+      tag: 'Rollout',
+      title: 'Copilot M365 now available to more teams',
+      excerpt: 'We are expanding access to Copilot in Word, Excel, Outlook and Teams. See how to request it and where to start.'
+    },
+    'news-prompt-library': {
+      tag: 'Library',
+      title: 'A new prompt pack for teams',
+      excerpt: 'Ready-made prompts for reports, meeting summaries and data analysis — copy them and use them at work right away.'
+    },
+    'news-policy-update': {
+      tag: 'AI Policy',
+      title: 'Update to the AI usage rules',
+      excerpt: 'We clarified the rules on confidential data and result verification. Take a look at the new version of the policy.'
+    }
   },
   policyRules: [
     'Treat AI as an assistant — the final decision and responsibility are always yours.',

@@ -53,13 +53,30 @@ export interface IPolicyRule {
   text: string;
 }
 
+export interface INewsItem {
+  id: string;
+  /** Data publikacji w formacie ISO (YYYY-MM-DD) — formatowana w UI per język */
+  date: string;
+  /** Kategoria wpisu (chip nad tytułem) */
+  tag: string;
+  title: string;
+  /** Zajawka na kafelku */
+  excerpt: string;
+  icon: string;
+  /** Gradient akcentu kafelka (CSS) */
+  accent: string;
+  /** Link do pełnego wpisu */
+  url: string;
+}
+
 // --- Globalne linki (podmień na docelowe) --------------------------------------
 export const LINKS = {
   booking: '#',          // Strona rezerwacji wizyt w AI Tech Bar
   policyFull: '#',       // Pełna Polityka AI (nowa karta)
   allTools: '#',         // Pełna lista narzędzi AI
   videoTraining: '#',    // Szkolenia wideo
-  prompts: '#'           // Prompty & Triki
+  prompts: '#',          // Prompty & Triki
+  news: '#'              // Pełna lista aktualności AI
 };
 
 // --- Narzędzia AI (karuzela) ---------------------------------------------------
@@ -242,7 +259,9 @@ export const NAV_ITEMS: INavItem[] = [
   { index: '01', label: 'Strefa Szkoleń', targetId: 'sec-szkolenia' },
   { index: '02', label: 'Cel', targetId: 'sec-cel' },
   { index: '03', label: 'Narzędzia AI', targetId: 'sec-tools' },
-  { index: '04', label: 'Tech Bar & Polityka', targetId: 'sec-booking' }
+  { index: '04', label: 'Tech Bar', targetId: 'sec-booking' },
+  { index: '05', label: 'News', targetId: 'sec-news' },
+  { index: '06', label: 'Polityka AI', targetId: 'sec-policy' }
 ];
 
 // --- Zasady korzystania z AI ---------------------------------------------------
@@ -265,6 +284,40 @@ export const POLICY_RULES: IPolicyRule[] = [
   }
 ];
 
+// --- News (aktualności AI) -----------------------------------------------------
+export const NEWS_ITEMS: INewsItem[] = [
+  {
+    id: 'news-copilot-rollout',
+    date: '2026-09-08',
+    tag: 'Wdrożenie',
+    title: 'Copilot M365 dostępny dla kolejnych zespołów',
+    excerpt: 'Rozszerzamy dostęp do Copilota w Word, Excel, Outlook i Teams. Sprawdź, jak złożyć wniosek i od czego zacząć.',
+    icon: '🚀',
+    accent: 'linear-gradient(135deg, #2f6bff 0%, #22d3ee 100%)',
+    url: '#'
+  },
+  {
+    id: 'news-prompt-library',
+    date: '2026-08-27',
+    tag: 'Biblioteka',
+    title: 'Nowa paczka promptów dla zespołów',
+    excerpt: 'Gotowe prompty do raportów, podsumowań spotkań i analizy danych — skopiuj i użyj od razu w swojej pracy.',
+    icon: '💡',
+    accent: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
+    url: '#'
+  },
+  {
+    id: 'news-policy-update',
+    date: '2026-08-12',
+    tag: 'Polityka AI',
+    title: 'Aktualizacja zasad korzystania z AI',
+    excerpt: 'Doprecyzowaliśmy reguły dotyczące danych poufnych i weryfikacji wyników. Zapoznaj się z nową wersją polityki.',
+    icon: '🛡️',
+    accent: 'linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)',
+    url: '#'
+  }
+];
+
 // =============================================================================
 // USTAWIENIA Z PROPERTY PANE
 // Płaska mapa linków edytowalna przez edytora strony. Puste pola = wartość
@@ -282,6 +335,7 @@ export interface ILinkSettings {
   linkAllTools?: string;
   linkVideoTraining?: string;
   linkPrompts?: string;
+  linkNews?: string;
 }
 
 export interface IResolvedSettings {
@@ -291,6 +345,7 @@ export interface IResolvedSettings {
     allTools: string;
     videoTraining: string;
     prompts: string;
+    news: string;
   };
   toolLinks: { [toolId: string]: { openUrl: string; requestUrl: string } };
 }
@@ -322,7 +377,8 @@ export const resolveSettings = (p: ILinkSettings | undefined): IResolvedSettings
       policyFull: pick(props.linkPolicy, LINKS.policyFull),
       allTools: pick(props.linkAllTools, LINKS.allTools),
       videoTraining: pick(props.linkVideoTraining, LINKS.videoTraining),
-      prompts: pick(props.linkPrompts, LINKS.prompts)
+      prompts: pick(props.linkPrompts, LINKS.prompts),
+      news: pick(props.linkNews, LINKS.news)
     },
     toolLinks
   };

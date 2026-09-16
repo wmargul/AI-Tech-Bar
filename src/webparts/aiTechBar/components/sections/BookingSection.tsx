@@ -1,9 +1,9 @@
 import * as React from 'react';
 import styles from '../AiTechBar.module.scss';
-import { POLICY_RULES, IResolvedSettings } from '../data/config';
+import { IResolvedSettings } from '../data/config';
 import { useL10n } from '../i18n';
 
-export interface IBookingPolicyProps {
+export interface IBookingSectionProps {
   settings: IResolvedSettings;
 }
 
@@ -12,7 +12,7 @@ const openLink = (url: string): void => {
   window.open(url, '_blank', 'noopener,noreferrer');
 };
 
-const BookingPolicy: React.FC<IBookingPolicyProps> = ({ settings }) => {
+const BookingSection: React.FC<IBookingSectionProps> = ({ settings }) => {
   const { t } = useL10n();
   return (
     <section id="sec-booking" className={styles.section}>
@@ -27,7 +27,7 @@ const BookingPolicy: React.FC<IBookingPolicyProps> = ({ settings }) => {
           </p>
         </div>
 
-        <div className={styles.bookingGrid}>
+        <div className={`${styles.bookingGrid} ${styles.bookingGridSolo}`}>
           <button
             type="button"
             className={styles.bookingCard}
@@ -52,32 +52,10 @@ const BookingPolicy: React.FC<IBookingPolicyProps> = ({ settings }) => {
               </span>
             </div>
           </button>
-
-          <div className={styles.policyCard}>
-            <h3 className={styles.policyTitle}>{t.booking.policyTitle}</h3>
-            <ul className={styles.policyList}>
-              {POLICY_RULES.map((rule, i) => (
-                <li key={i} className={styles.policyItem} style={{ animationDelay: `${i * 90}ms` }}>
-                  <span className={styles.policyIcon}>{rule.icon}</span>
-                  <span className={styles.policyText}>{t.policyRules[i] || rule.text}</span>
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              className={styles.policyLink}
-              onClick={() => openLink(settings.links.policyFull)}
-            >
-              {t.booking.policyLink}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
         </div>
       </div>
     </section>
   );
 };
 
-export default BookingPolicy;
+export default BookingSection;

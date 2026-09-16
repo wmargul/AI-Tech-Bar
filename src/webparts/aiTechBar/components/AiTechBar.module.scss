@@ -2414,6 +2414,13 @@
   align-items: stretch;
 }
 
+// Booking jako samodzielna sekcja — jedna karta wyśrodkowana, bez rozciągania
+// na całą szerokość siatki treści.
+.bookingGridSolo {
+  grid-template-columns: minmax(0, 680px);
+  justify-content: center;
+}
+
 .bookingCard {
   position: relative;
   overflow: hidden;
@@ -2590,6 +2597,184 @@
 .policyLink svg { color: #6ee7ff; }
 .policyLink:hover { gap: 14px; }
 
+// Polityka AI jako samodzielna sekcja — karta wyśrodkowana, zasady w dwóch
+// kolumnach, żeby wypełnić szerokość bez rozciągania wierszy tekstu.
+.policyCardWide {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 38px;
+  gap: 24px;
+}
+
+.policyListWide {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 28px;
+}
+
+// ---------- NEWS ----------
+.newsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.newsCard {
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  padding: 30px 28px;
+  border-radius: 24px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 330px;
+  color: var(--c-text);
+  // Wejście kafelków (stagger) na właściwości `translate`, żeby nie kolidowało
+  // z `transform` używanym przy hoverze.
+  opacity: 0;
+  translate: 0 14px;
+  animation: newsIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+@keyframes newsIn {
+  to { opacity: 1; translate: 0 0; }
+}
+
+.newsCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 22px 50px rgba(8, 10, 30, 0.55);
+}
+
+.newsGlow {
+  position: absolute;
+  top: -60%;
+  right: -30%;
+  width: 70%;
+  height: 120%;
+  opacity: 0;
+  filter: blur(40px);
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.newsCard:hover .newsGlow { opacity: 0.35; }
+
+.newsTop {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.newsIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.3s ease;
+}
+
+.newsCard:hover .newsIcon { transform: scale(1.08); }
+
+.newsDate {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--c-text-faint);
+}
+
+.newsTag {
+  position: relative;
+  align-self: flex-start;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.newsTitle {
+  position: relative;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.newsExcerpt {
+  position: relative;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--c-text-dim);
+  flex: 1;
+}
+
+.newsCta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  background-image: linear-gradient(100deg, #b39bff, #6ee7ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  transition: gap 0.25s ease;
+}
+
+.newsCta svg { color: #6ee7ff; }
+.newsCard:hover .newsCta { gap: 14px; }
+
+.newsFoot {
+  display: flex;
+  justify-content: center;
+  margin-top: 34px;
+}
+
+.newsAllBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  transition: gap 0.25s ease, transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.newsAllBtn:hover {
+  gap: 16px;
+  transform: translateY(-2px);
+  border-color: rgba(139, 92, 246, 0.55);
+  box-shadow: 0 18px 40px rgba(8, 10, 30, 0.5);
+}
+
 // ---------- PASEK NAWIGACYJNY (sticky) ----------
 .navBar {
   position: sticky;
@@ -2643,6 +2828,7 @@
   gap: 4px;
   flex-wrap: nowrap;
   overflow: hidden;
+  min-width: 0;
 }
 
 .navBarLink {
@@ -2813,15 +2999,35 @@
 // ---------------------------------------------------------------------------
 // RESPONSYWNOŚĆ
 // ---------------------------------------------------------------------------
+// Sześć pozycji nawigacji nie mieści się obok logo i CTA na węższych ekranach.
+// Zanim pasek zacząłby ucinać linki (nowrap + overflow), skracamy je do samych
+// etykiet, a poniżej 1100px chowamy — nawigację przejmują kafelki w hero.
+@media (max-width: 1360px) {
+  .navBarLinkIndex { display: none; }
+  .navBarLink { padding: 9px 11px; }
+}
+
+@media (max-width: 1160px) {
+  .navLeft { gap: 10px; }
+  .navBarLink { padding: 8px 9px; font-size: 12px; }
+}
+
+@media (max-width: 1100px) {
+  .navBarLinks { display: none; }
+}
+
 @media (max-width: 920px) {
   .goalGrid { grid-template-columns: repeat(2, 1fr); }
   .trainingGrid { grid-template-columns: 1fr; }
   .bookingGrid { grid-template-columns: 1fr; }
-  .navBarLinks { display: none; }
+  .newsGrid { grid-template-columns: repeat(2, 1fr); }
+  .policyListWide { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
   .goalGrid { grid-template-columns: 1fr; }
+  .newsGrid { grid-template-columns: 1fr; }
+  .newsCard { min-height: 0; }
   .carouselStage { max-width: 320px; }
   .toolCard { width: 270px; margin-left: -135px; }
   .carouselPrev { left: -6px; }
