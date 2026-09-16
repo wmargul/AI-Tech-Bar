@@ -353,6 +353,7 @@ export interface ILinkSettings {
   linkNews?: string;
   bookingBusinessId?: string;
   bookingTimeZone?: string;
+  bookingDemoMode?: boolean;
 }
 
 export interface IResolvedSettings {
@@ -368,6 +369,8 @@ export interface IResolvedSettings {
     businessId: string;
     timeZone: string;
     daysAhead: number;
+    /** Terminy z zaślepek zamiast z Graph — do przeglądu przed zgodą admina. */
+    demoMode: boolean;
   };
   toolLinks: { [toolId: string]: { openUrl: string; requestUrl: string } };
 }
@@ -405,7 +408,8 @@ export const resolveSettings = (p: ILinkSettings | undefined): IResolvedSettings
     booking: {
       businessId: pick(props.bookingBusinessId, BOOKING.businessId),
       timeZone: pick(props.bookingTimeZone, BOOKING.timeZone),
-      daysAhead: BOOKING.daysAhead
+      daysAhead: BOOKING.daysAhead,
+      demoMode: props.bookingDemoMode === true
     },
     toolLinks
   };

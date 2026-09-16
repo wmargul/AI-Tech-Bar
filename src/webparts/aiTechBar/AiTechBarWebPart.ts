@@ -5,6 +5,7 @@ import {
   type IPropertyPaneConfiguration,
   PropertyPaneTextField,
   PropertyPaneToggle,
+  PropertyPaneLabel,
   PropertyPaneSlider
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
@@ -187,6 +188,16 @@ export default class AiTechBarWebPart extends BaseClientSideWebPart<IAiTechBarWe
                 PropertyPaneTextField('bookingTimeZone', {
                   label: 'Strefa czasowa kalendarza',
                   description: `Nazwa IANA, np. ${BOOKING.timeZone}. W tej strefie interpretowane są godziny pracy Tech Baru.`
+                }),
+                PropertyPaneToggle('bookingDemoMode', {
+                  label: 'Tryb demonstracyjny',
+                  onText: 'Włączony',
+                  offText: 'Wyłączony'
+                }),
+                PropertyPaneLabel('bookingDemoModeHint', {
+                  text: 'Pokazuje przykładowe terminy bez łączenia się z Microsoft Graph — '
+                    + 'do przeglądu przepływu, dopóki administrator nie zatwierdzi uprawnień. '
+                    + 'Wizyty nie są zapisywane. Wyłącz przed publikacją.'
                 })
               ]
             },

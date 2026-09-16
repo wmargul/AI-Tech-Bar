@@ -64,6 +64,7 @@ export interface IStrings {
     pickService: string; bookingFor: string; dateLabel: string; timeLabel: string;
     prevMonth: string; nextMonth: string; pickDay: string;
     slotLead: string; timeZoneNote: string; allTimesIn: string;
+    demoBadge: string; demoNote: string; demoDoneTitle: string; demoDoneLead: string;
     today: string; tomorrow: string;
     noSlots: string; noSlotsHint: string;
     nameLabel: string; emailLabel: string; notesLabel: string; notesPlaceholder: string;
@@ -205,6 +206,10 @@ const PL: IStrings = {
     slotLead: 'Wybierz dzień i godzinę, które Ci pasują.',
     timeZoneNote: 'Godziny w strefie',
     allTimesIn: 'Wszystkie godziny są w strefie',
+    demoBadge: 'Tryb demonstracyjny',
+    demoNote: 'Terminy są przykładowe, a wizyta nie zostanie zapisana w kalendarzu.',
+    demoDoneTitle: 'Tak wygląda potwierdzenie',
+    demoDoneLead: 'To podgląd przepływu — rezerwacja nie została utworzona.',
     today: 'Dziś',
     tomorrow: 'Jutro',
     noSlots: 'Brak wolnych terminów w tym zakresie.',
@@ -442,6 +447,10 @@ const EN: IStrings = {
     slotLead: 'Pick a day and time that works for you.',
     timeZoneNote: 'Times in',
     allTimesIn: 'All times are in',
+    demoBadge: 'Demo mode',
+    demoNote: 'Times shown are samples and no appointment will be saved to any calendar.',
+    demoDoneTitle: 'This is the confirmation screen',
+    demoDoneLead: 'Flow preview only — no booking was created.',
     today: 'Today',
     tomorrow: 'Tomorrow',
     noSlots: 'No available times in this range.',

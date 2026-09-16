@@ -22,6 +22,7 @@ import {
   zoneOffsetMinutes
 } from '../data/bookingSlots';
 import { ICalendarEvent, downloadIcs, outlookDeepLink } from '../data/bookingIcs';
+import { demoBookingContext, demoBusyByStaff } from '../data/bookingDemo';
 import BookingCalendar from './BookingCalendar';
 
 export interface IBookingExperienceProps {
@@ -77,6 +78,9 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
   const { t, lang } = useL10n();
   const s = t.bookingFlow;
   const tz = settings.booking.timeZone;
+  // Bez fabryki Graph (workbench) demo jest jedyną sensowną ścieżką — inaczej
+  // overlay pokazałby wyłącznie błąd uprawnień.
+  const demo = settings.booking.demoMode || !graphFactory;
 
   const panelRef = React.useRef<HTMLDivElement>(null);
   const closingRef = React.useRef<boolean>(false);
@@ -188,9 +192,12 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
 
   // --- Pobranie konfiguracji kalendarza ---------------------------------------
   const loadContext = React.useCallback(async (): Promise<void> => {
-    if (!graphFactory) {
-      setError({ kind: 'permissions', message: 'Microsoft Graph niedostępny w tym kontekście.' });
-      setStage('failed');
+    if (demo) {
+      const ctx = demoBookingContext();
+      setContext(ctx);
+      setService(ctx.services[0]);
+      setError(undefined);
+      setStage('pick');
       return;
     }
     setStage('loading');
@@ -216,7 +223,7 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
       setError(classifyError(e));
       setStage('failed');
     }
-  }, [graphFactory, getClient, settings.booking.businessId]);
+  }, [demo, getClient, settings.booking.businessId]);
 
   React.useEffect(() => {
     if (!open) return;
@@ -252,13 +259,15 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
 
       let busyByStaff: { start: Date; end: Date }[][] = [];
       try {
-        busyByStaff = await loadBusyByStaff(
-          await getClient(),
-          pool.map((m) => m.emailAddress),
-          now,
-          to,
-          Math.max(5, Math.min(service.durationMin, 60))
-        );
+        busyByStaff = demo
+          ? demoBusyByStaff(service.id, now, to, tz)
+          : await loadBusyByStaff(
+            await getClient(),
+            pool.map((m) => m.emailAddress),
+            now,
+            to,
+            Math.max(5, Math.min(service.durationMin, 60))
+          );
       } catch (e) {
         // Brak wglądu we free/busy nie może zablokować rezerwacji — Bookings
         // i tak odrzuci zajęty termin przy zapisie.
@@ -305,7 +314,7 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
     });
 
     return () => { active = false; };
-  }, [open, service, context, tz, getClient, settings.booking.daysAhead]);
+  }, [open, service, context, tz, demo, getClient, settings.booking.daysAhead]);
 
   // --- Zapis rezerwacji -------------------------------------------------------
   const calendarEvent = React.useMemo((): ICalendarEvent | undefined => {
@@ -323,6 +332,11 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
     if (!slot || !service) return;
     setStage('sending');
     setError(undefined);
+    if (demo) {
+      // Nic nie zapisujemy — pokazujemy tylko, jak wygląda potwierdzenie.
+      setStage('done');
+      return;
+    }
     try {
       const pool = service.staffMemberIds.length > 0
         ? service.staffMemberIds
@@ -346,7 +360,7 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
       setError(classifyError(e));
       setStage('fallback');
     }
-  }, [slot, service, context, getClient, settings.booking.businessId, name, email, tz, notes]);
+  }, [slot, service, context, demo, getClient, settings.booking.businessId, name, email, tz, notes]);
 
   if (!open) return null;
 
@@ -383,6 +397,13 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
           </div>
           <button type="button" className={styles.bkClose} onClick={requestClose} aria-label={s.close}>×</button>
         </div>
+
+        {demo && (
+          <p className={styles.bkDemoBanner}>
+            <span className={styles.bkDemoBadge}>{s.demoBadge}</span>
+            {s.demoNote}
+          </p>
+        )}
 
         {showSteps && (
           <ol className={styles.bkSteps}>
@@ -595,9 +616,9 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
           {stage === 'done' && slot && (
             <div className={styles.bkCenter}>
               <span className={styles.bkTick} aria-hidden="true">✓</span>
-              <h3 className={styles.bkDoneTitle}>{s.successTitle}</h3>
+              <h3 className={styles.bkDoneTitle}>{demo ? s.demoDoneTitle : s.successTitle}</h3>
               <p className={styles.bkDoneWhen}>{longDayFmt.format(slot.start)}</p>
-              <p className={styles.bkMuted}>{s.successMail}</p>
+              <p className={styles.bkMuted}>{demo ? s.demoDoneLead : s.successMail}</p>
               <div className={styles.bkActions}>
                 {calendarEvent && (
                   <button
