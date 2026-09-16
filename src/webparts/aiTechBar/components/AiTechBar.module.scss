@@ -3940,3 +3940,710 @@
     animation: none !important;
   }
 }
+
+// =============================================================================
+// REZERWACJA WIZYTY — overlay (Bookings przez Graph, bez opuszczania strony)
+// =============================================================================
+.bkOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999997;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--c-text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.bkScrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(5, 7, 15, 0.78);
+  backdrop-filter: blur(10px);
+}
+
+.bkPanel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 840px;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(165deg, rgba(24, 20, 56, 0.96), rgba(10, 12, 28, 0.98));
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+  transform-origin: 50% 50%;
+  overflow: hidden;
+}
+
+.bkHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 26px 28px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bkEyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+  margin-bottom: 8px;
+}
+
+.bkTitle {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.bkClose {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.bkClose:hover { color: #fff; background: rgba(255, 255, 255, 0.12); transform: rotate(90deg); }
+
+// ---------- Kroki ----------
+.bkSteps {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 16px 28px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+
+.bkStep {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 6px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.bkStepDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.bkStepActive {
+  color: #fff;
+  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.16);
+}
+
+.bkStepActive .bkStepDot {
+  background: linear-gradient(100deg, #b39bff, #6ee7ff);
+  color: #16103a;
+  border-color: transparent;
+}
+
+.bkStepDone { color: var(--c-text-dim); }
+.bkStepDone .bkStepDot { background: rgba(110, 231, 255, 0.2); color: #6ee7ff; }
+
+// ---------- Ciało ----------
+.bkBody {
+  padding: 20px 28px 28px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.5) transparent;
+}
+
+.bkBody::-webkit-scrollbar { width: 8px; }
+.bkBody::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--c-accent-from), var(--c-accent-to));
+  border-radius: 8px;
+}
+
+.bkLead {
+  margin: 0 0 18px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--c-text-dim);
+}
+
+.bkMuted {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--c-text-faint);
+}
+
+.bkCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 26px 0;
+}
+
+.bkEmptyTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.bkSpinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  border-top-color: #6ee7ff;
+  animation: bkSpin 0.9s linear infinite;
+}
+
+@keyframes bkSpin {
+  to { transform: rotate(360deg); }
+}
+
+// ---------- Wybór usługi ----------
+.bkServiceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.bkServiceCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+  padding: 18px 20px;
+  border-radius: 18px;
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.bkServiceCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.bkServiceName { font-size: 17px; font-weight: 700; }
+.bkServiceDesc { font-size: 13px; line-height: 1.5; color: var(--c-text-dim); }
+.bkServiceMeta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+
+.bkChip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+// ---------- Wybór dnia i godziny ----------
+.bkDayRow {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+  scrollbar-width: thin;
+}
+
+.bkDayChip {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 84px;
+  cursor: pointer;
+  padding: 10px 12px;
+  border-radius: 14px;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.bkDayChip:hover { color: #fff; border-color: rgba(139, 92, 246, 0.45); }
+
+.bkDayChipActive {
+  color: #fff;
+  background: rgba(139, 92, 246, 0.18);
+  border-color: rgba(139, 92, 246, 0.6);
+}
+
+.bkDayName { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.bkDayCount { font-family: var(--mono); font-size: 10px; color: var(--c-text-faint); }
+
+.bkSlotGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 10px;
+}
+
+.bkSlot {
+  cursor: pointer;
+  padding: 12px 8px;
+  border-radius: 12px;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.bkSlot:hover {
+  transform: translateY(-2px);
+  border-color: rgba(110, 231, 255, 0.6);
+  background: rgba(110, 231, 255, 0.14);
+}
+
+// ---------- Podsumowanie i formularz ----------
+.bkSummary {
+  margin: 0 0 20px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bkSummaryRow {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.bkSummaryRow dt {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+
+.bkSummaryRow dd {
+  margin: 0;
+  text-align: right;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.bkFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.bkField {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.bkFieldLabel {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+
+.bkInput,
+.bkTextarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.bkTextarea { resize: vertical; line-height: 1.5; }
+
+.bkInput:focus,
+.bkTextarea:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.65);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.bkInput:disabled,
+.bkTextarea:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.bkError {
+  margin: 0 0 14px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ffd9d9;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+// ---------- Akcje ----------
+.bkActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.bkCenter .bkActions { justify-content: center; }
+
+.bkPrimaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  color: #16103a;
+  background: linear-gradient(100deg, #b39bff, #6ee7ff);
+  box-shadow: 0 12px 30px rgba(110, 160, 255, 0.35);
+  transition: gap 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease, opacity 0.2s ease;
+}
+
+.bkPrimaryBtn:hover { gap: 14px; transform: translateY(-2px); box-shadow: 0 16px 36px rgba(110, 160, 255, 0.5); }
+.bkPrimaryBtn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.bkGhostBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.bkGhostBtn:hover { color: #fff; border-color: rgba(139, 92, 246, 0.5); background: rgba(139, 92, 246, 0.12); }
+.bkGhostBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+// ---------- Potwierdzenie ----------
+.bkTick {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: #16103a;
+  background: linear-gradient(135deg, #6ee7ff, #34e7c3);
+  box-shadow: 0 16px 40px rgba(52, 231, 195, 0.4);
+  animation: bkTickIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes bkTickIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.bkDoneTitle { margin: 0; font-size: 22px; font-weight: 800; }
+.bkDoneWhen { margin: 0; font-size: 16px; font-weight: 600; color: #b39bff; }
+
+@media (max-width: 600px) {
+  .bkOverlay { padding: 12px; }
+  .bkPanel { max-height: calc(100vh - 24px); border-radius: 20px; }
+  .bkHead { padding: 20px 18px 14px; }
+  .bkSteps { padding: 12px 18px 0; }
+  .bkBody { padding: 16px 18px 22px; }
+  .bkFields { grid-template-columns: 1fr; }
+  .bkSlotGrid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+  .bkActions { justify-content: stretch; }
+  .bkActions > * { flex: 1 1 auto; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bkSpinner { animation-duration: 2.4s; }
+  .bkTick { animation: none; }
+  .bkClose:hover { transform: none; }
+  .bkServiceCard:hover,
+  .bkSlot:hover,
+  .bkPrimaryBtn:hover { transform: none; }
+}
+
+// ---------- Rezerwacja: nagłówki grup, kalendarz, dwie kolumny ----------
+.bkGroupHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+
+.bkGroupIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  color: #6ee7ff;
+  background: rgba(110, 231, 255, 0.12);
+  border: 1px solid rgba(110, 231, 255, 0.28);
+}
+
+.bkServiceTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bkServiceCardActive {
+  border-color: rgba(139, 92, 246, 0.7);
+  background: rgba(139, 92, 246, 0.14);
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.35), 0 16px 40px rgba(60, 40, 140, 0.35);
+}
+
+.bkRadio {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: transparent;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.bkRadioOn {
+  color: #16103a;
+  background: linear-gradient(135deg, #b39bff, #6ee7ff);
+  border-color: transparent;
+}
+
+.bkForPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: center;
+  margin: 18px auto 22px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.bkForPill strong { color: #fff; font-weight: 700; }
+
+.bkDayHeading {
+  margin: 0 0 18px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+.bkPickGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.bkPickCol { min-width: 0; }
+
+// ---------- Kalendarz miesięczny ----------
+.bkCal {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.bkCalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.bkCalMonth {
+  flex: 1 1 auto;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.bkCalNav {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.bkCalNav:hover:not(:disabled) {
+  color: #fff;
+  background: rgba(139, 92, 246, 0.18);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.bkCalNav:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.bkCalWeek,
+.bkCalGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.bkCalWeek { margin-bottom: 6px; }
+
+.bkCalWeekDay {
+  text-align: center;
+  padding: 4px 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--c-text-faint);
+}
+
+.bkCalPad { aspect-ratio: 1 / 1; }
+
+.bkCalDay {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  // Dni bez wolnych terminów zostają widoczne, ale wygaszone — tak jak
+  // weekendy i przeszłość na stronie Bookings.
+  color: rgba(238, 241, 255, 0.28);
+  cursor: not-allowed;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.bkCalDayFree {
+  color: var(--c-text);
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.bkCalDayFree:hover {
+  transform: scale(1.06);
+  border-color: rgba(139, 92, 246, 0.55);
+  background: rgba(139, 92, 246, 0.16);
+}
+
+.bkCalDayActive,
+.bkCalDayActive.bkCalDayFree {
+  color: #16103a;
+  font-weight: 800;
+  background: linear-gradient(135deg, #b39bff, #6ee7ff);
+  border-color: transparent;
+  box-shadow: 0 8px 22px rgba(110, 160, 255, 0.4);
+}
+
+.bkTzNote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 26px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  color: var(--c-text-faint);
+}
+
+@media (max-width: 720px) {
+  .bkPickGrid { grid-template-columns: 1fr; gap: 22px; }
+  .bkServiceGrid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bkCalDayFree:hover { transform: none; }
+}

@@ -56,6 +56,25 @@ export interface IStrings {
     kicker: string; title: ITitleParts; lead: string;
     policyTitle: string; policyLink: string;
   };
+  bookingFlow: {
+    eyebrow: string; title: string; close: string;
+    steps: { service: string; slot: string; confirm: string };
+    loading: string;
+    serviceLead: string; minutes: string; online: string; onsite: string;
+    pickService: string; bookingFor: string; dateLabel: string; timeLabel: string;
+    prevMonth: string; nextMonth: string; pickDay: string;
+    slotLead: string; timeZoneNote: string; allTimesIn: string;
+    today: string; tomorrow: string;
+    noSlots: string; noSlotsHint: string;
+    nameLabel: string; emailLabel: string; notesLabel: string; notesPlaceholder: string;
+    summaryWhen: string; summaryWhat: string; summaryWho: string;
+    back: string; submit: string; submitting: string;
+    successTitle: string; successLead: string; successMail: string;
+    addToCalendar: string; openOutlook: string; done: string;
+    fallbackTitle: string; fallbackLead: string; fallbackCta: string;
+    errorPermissions: string; errorRules: string; errorGeneric: string;
+    retry: string; openOriginal: string;
+  };
   news: {
     kicker: string; title: ITitleParts; lead: string;
     readCta: string; allCta: string;
@@ -165,6 +184,55 @@ const PL: IStrings = {
     lead: 'Cztery zasady, które chronią Ciebie i firmę. Poznaj je, zanim zaczniesz pracę z narzędziami AI.',
     policyTitle: 'Zasady korzystania z AI',
     policyLink: 'Przeczytaj pełną Politykę AI'
+  },
+  bookingFlow: {
+    eyebrow: 'AI Tech Bar · Rezerwacja',
+    title: 'Zarezerwuj sesję z ekspertem',
+    close: 'Zamknij',
+    steps: { service: 'Temat', slot: 'Termin', confirm: 'Potwierdzenie' },
+    loading: 'Sprawdzam wolne terminy…',
+    serviceLead: 'Z czym chcesz popracować? Wybierz temat sesji.',
+    minutes: 'min',
+    online: 'Online',
+    onsite: 'Na miejscu',
+    pickService: 'Wybierz lokalizację',
+    bookingFor: 'Rezerwacja dla',
+    dateLabel: 'Data',
+    timeLabel: 'Godzina',
+    prevMonth: 'Poprzedni miesiąc',
+    nextMonth: 'Następny miesiąc',
+    pickDay: 'Wybierz dzień z kalendarza, aby zobaczyć wolne godziny.',
+    slotLead: 'Wybierz dzień i godzinę, które Ci pasują.',
+    timeZoneNote: 'Godziny w strefie',
+    allTimesIn: 'Wszystkie godziny są w strefie',
+    today: 'Dziś',
+    tomorrow: 'Jutro',
+    noSlots: 'Brak wolnych terminów w tym zakresie.',
+    noSlotsHint: 'Spróbuj wybrać inny dzień albo zajrzyj później — kalendarz zmienia się na bieżąco.',
+    nameLabel: 'Imię i nazwisko',
+    emailLabel: 'E-mail',
+    notesLabel: 'Czego dotyczy sesja? (opcjonalnie)',
+    notesPlaceholder: 'Np. chcę nauczyć się analizować dane w Excelu z Copilotem…',
+    summaryWhen: 'Termin',
+    summaryWhat: 'Temat',
+    summaryWho: 'Rezerwuje',
+    back: 'Wróć',
+    submit: 'Zarezerwuj wizytę',
+    submitting: 'Rezerwuję…',
+    successTitle: 'Termin zarezerwowany',
+    successLead: 'Do zobaczenia w AI Tech Bar!',
+    successMail: 'Potwierdzenie z zaproszeniem do kalendarza wysłaliśmy na Twój e-mail.',
+    addToCalendar: 'Dodaj do mojego kalendarza',
+    openOutlook: 'Otwórz w Outlooku',
+    done: 'Gotowe',
+    fallbackTitle: 'Dokończ w kalendarzu',
+    fallbackLead: 'Nie udało się zapisać terminu automatycznie. Możesz dodać wizytę do swojego kalendarza i potwierdzić ją z ekspertem.',
+    fallbackCta: 'Pobierz wydarzenie (.ics)',
+    errorPermissions: 'Rezerwacja online czeka na zgodę administratora na dostęp do kalendarza.',
+    errorRules: 'Ten termin nie spełnia zasad kalendarza Tech Baru — wybierz inny.',
+    errorGeneric: 'Nie udało się połączyć z kalendarzem Tech Baru.',
+    retry: 'Spróbuj ponownie',
+    openOriginal: 'Otwórz stronę rezerwacji'
   },
   news: {
     kicker: '#05 · News',
@@ -353,6 +421,55 @@ const EN: IStrings = {
     lead: 'Four rules that protect you and the company. Get to know them before you start working with AI tools.',
     policyTitle: 'AI usage rules',
     policyLink: 'Read the full AI Policy'
+  },
+  bookingFlow: {
+    eyebrow: 'AI Tech Bar · Booking',
+    title: 'Book a session with an expert',
+    close: 'Close',
+    steps: { service: 'Topic', slot: 'Time', confirm: 'Confirm' },
+    loading: 'Checking available times…',
+    serviceLead: 'What would you like to work on? Pick a session topic.',
+    minutes: 'min',
+    online: 'Online',
+    onsite: 'On site',
+    pickService: 'Choose a location',
+    bookingFor: 'Booking for',
+    dateLabel: 'Date',
+    timeLabel: 'Time',
+    prevMonth: 'Previous month',
+    nextMonth: 'Next month',
+    pickDay: 'Pick a day in the calendar to see available times.',
+    slotLead: 'Pick a day and time that works for you.',
+    timeZoneNote: 'Times in',
+    allTimesIn: 'All times are in',
+    today: 'Today',
+    tomorrow: 'Tomorrow',
+    noSlots: 'No available times in this range.',
+    noSlotsHint: 'Try another day or check back later — the calendar updates continuously.',
+    nameLabel: 'Full name',
+    emailLabel: 'Email',
+    notesLabel: 'What is the session about? (optional)',
+    notesPlaceholder: 'E.g. I want to learn how to analyze data in Excel with Copilot…',
+    summaryWhen: 'When',
+    summaryWhat: 'Topic',
+    summaryWho: 'Booked by',
+    back: 'Back',
+    submit: 'Book the visit',
+    submitting: 'Booking…',
+    successTitle: 'Your visit is booked',
+    successLead: 'See you at the AI Tech Bar!',
+    successMail: 'We sent a confirmation with a calendar invite to your email.',
+    addToCalendar: 'Add to my calendar',
+    openOutlook: 'Open in Outlook',
+    done: 'Done',
+    fallbackTitle: 'Finish in your calendar',
+    fallbackLead: "We couldn't save the booking automatically. You can add the visit to your calendar and confirm it with the expert.",
+    fallbackCta: 'Download event (.ics)',
+    errorPermissions: 'Online booking is waiting for an administrator to approve calendar access.',
+    errorRules: "That time doesn't meet the Tech Bar calendar rules — please pick another.",
+    errorGeneric: "We couldn't reach the Tech Bar calendar.",
+    retry: 'Try again',
+    openOriginal: 'Open the booking page'
   },
   news: {
     kicker: '#05 · News',

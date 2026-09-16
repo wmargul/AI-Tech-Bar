@@ -79,6 +79,21 @@ export const LINKS = {
   news: '#'              // Pełna lista aktualności AI
 };
 
+// --- Rezerwacja wizyt (Microsoft Bookings przez Graph) -------------------------
+// businessId kalendarza Bookings to adres SMTP jego skrzynki — ten sam, który
+// występuje w publicznym linku: bookings.cloud.microsoft/book/{businessId}/
+export const BOOKING = {
+  businessId: 'AITechBarWizyta@turner.onmicrosoft.com',
+  /** Strefa czasowa kalendarza Bookings (IANA) — w niej liczone są godziny pracy. */
+  timeZone: 'Europe/Warsaw',
+  /** Ile dni naprzód pokazujemy w wyborze terminu. */
+  daysAhead: 21,
+  /** Godziny pracy używane, gdy Graph nie zwróci ich z kalendarza (pon–pt). */
+  fallbackHours: { start: '09:00', end: '17:00' },
+  /** Domyślna długość wizyty, gdy usługa nie podaje własnej. */
+  fallbackDurationMin: 30
+};
+
 // --- Narzędzia AI (karuzela) ---------------------------------------------------
 export const TOOLS: ITool[] = [
   {
@@ -336,6 +351,8 @@ export interface ILinkSettings {
   linkVideoTraining?: string;
   linkPrompts?: string;
   linkNews?: string;
+  bookingBusinessId?: string;
+  bookingTimeZone?: string;
 }
 
 export interface IResolvedSettings {
@@ -346,6 +363,11 @@ export interface IResolvedSettings {
     videoTraining: string;
     prompts: string;
     news: string;
+  };
+  booking: {
+    businessId: string;
+    timeZone: string;
+    daysAhead: number;
   };
   toolLinks: { [toolId: string]: { openUrl: string; requestUrl: string } };
 }
@@ -379,6 +401,11 @@ export const resolveSettings = (p: ILinkSettings | undefined): IResolvedSettings
       videoTraining: pick(props.linkVideoTraining, LINKS.videoTraining),
       prompts: pick(props.linkPrompts, LINKS.prompts),
       news: pick(props.linkNews, LINKS.news)
+    },
+    booking: {
+      businessId: pick(props.bookingBusinessId, BOOKING.businessId),
+      timeZone: pick(props.bookingTimeZone, BOOKING.timeZone),
+      daysAhead: BOOKING.daysAhead
     },
     toolLinks
   };

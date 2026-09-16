@@ -3,7 +3,7 @@
   "solution": {
     "name": "ai-tech-bar-client-side-solution",
     "id": "ec812fbd-50d2-42d1-ab7f-67197bdf8bfb",
-    "version": "1.1.0.0",
+    "version": "1.2.0.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
@@ -25,12 +25,17 @@
       "videoUrl": "",
       "categories": []
     },
+    "webApiPermissionRequests": [
+      { "resource": "Microsoft Graph", "scope": "Bookings.Read.All" },
+      { "resource": "Microsoft Graph", "scope": "BookingsAppointment.ReadWrite.All" },
+      { "resource": "Microsoft Graph", "scope": "Calendars.Read" }
+    ],
     "features": [
       {
         "title": "ai-tech-bar Feature",
         "description": "The feature that activates elements of the ai-tech-bar solution.",
         "id": "618549a2-6c6f-44d6-8dd1-5634feb908f2",
-        "version": "1.1.0.0"
+        "version": "1.2.0.0"
       }
     ]
   },

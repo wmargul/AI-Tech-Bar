@@ -1,19 +1,29 @@
 import * as React from 'react';
+import { MSGraphClientFactory } from '@microsoft/sp-http';
 import styles from '../AiTechBar.module.scss';
 import { IResolvedSettings } from '../data/config';
 import { useL10n } from '../i18n';
+import BookingExperience from './BookingExperience';
 
 export interface IBookingSectionProps {
   settings: IResolvedSettings;
+  graphFactory?: MSGraphClientFactory;
+  userDisplayName: string;
+  userEmail: string;
 }
 
-const openLink = (url: string): void => {
-  if (!url || url === '#') return;
-  window.open(url, '_blank', 'noopener,noreferrer');
-};
-
-const BookingSection: React.FC<IBookingSectionProps> = ({ settings }) => {
+const BookingSection: React.FC<IBookingSectionProps> = ({
+  settings, graphFactory, userDisplayName, userEmail
+}) => {
   const { t } = useL10n();
+  const [open, setOpen] = React.useState<boolean>(false);
+  const [origin, setOrigin] = React.useState<{ x: number; y: number } | undefined>(undefined);
+
+  const openBooking = (e: React.MouseEvent): void => {
+    setOrigin({ x: e.clientX, y: e.clientY });
+    setOpen(true);
+  };
+
   return (
     <section id="sec-booking" className={styles.section}>
       <div className={styles.sectionInner}>
@@ -31,7 +41,7 @@ const BookingSection: React.FC<IBookingSectionProps> = ({ settings }) => {
           <button
             type="button"
             className={styles.bookingCard}
-            onClick={() => openLink(settings.links.booking)}
+            onClick={openBooking}
           >
             <span className={styles.bookingOrb} />
             <span className={styles.bookingOrb2} />
@@ -54,6 +64,18 @@ const BookingSection: React.FC<IBookingSectionProps> = ({ settings }) => {
           </button>
         </div>
       </div>
+
+      {open && (
+        <BookingExperience
+          open={open}
+          onClose={() => setOpen(false)}
+          origin={origin}
+          settings={settings}
+          graphFactory={graphFactory}
+          userDisplayName={userDisplayName}
+          userEmail={userEmail}
+        />
+      )}
     </section>
   );
 };

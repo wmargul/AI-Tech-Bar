@@ -13,7 +13,7 @@ import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import * as strings from 'AiTechBarWebPartStrings';
 import AiTechBar from './components/AiTechBar';
 import { IAiTechBarProps } from './components/IAiTechBarProps';
-import { TOOLS, resolveSettings, toolOpenKey, toolRequestKey, ILinkSettings } from './components/data/config';
+import { TOOLS, BOOKING, resolveSettings, toolOpenKey, toolRequestKey, ILinkSettings } from './components/data/config';
 
 export interface IAiTechBarWebPartProps extends ILinkSettings {
   description: string;
@@ -39,6 +39,8 @@ export default class AiTechBarWebPart extends BaseClientSideWebPart<IAiTechBarWe
         environmentMessage: this._environmentMessage,
         hasTeamsContext: !!this.context.sdks.microsoftTeams,
         userDisplayName: this.context.pageContext.user.displayName,
+        userEmail: this.context.pageContext.user.email || this.context.pageContext.user.loginName || '',
+        graphFactory: this.context.msGraphClientFactory,
         settings: resolveSettings(this.properties),
         isEditMode: this.displayMode === DisplayMode.Edit,
         fullScreen: this.properties.fullScreen !== false,
@@ -173,6 +175,19 @@ export default class AiTechBarWebPart extends BaseClientSideWebPart<IAiTechBarWe
                 PropertyPaneTextField('linkVideoTraining', { label: 'Szkolenia Wideo' }),
                 PropertyPaneTextField('linkPrompts', { label: 'Prompty & Triki' }),
                 PropertyPaneTextField('linkNews', { label: 'Wszystkie aktualności (News)' })
+              ]
+            },
+            {
+              groupName: 'Rezerwacja wizyt',
+              groupFields: [
+                PropertyPaneTextField('bookingBusinessId', {
+                  label: 'Kalendarz Bookings — adres skrzynki',
+                  description: `Domyślnie ${BOOKING.businessId}. To ten sam identyfikator, który występuje w publicznym linku do rezerwacji.`
+                }),
+                PropertyPaneTextField('bookingTimeZone', {
+                  label: 'Strefa czasowa kalendarza',
+                  description: `Nazwa IANA, np. ${BOOKING.timeZone}. W tej strefie interpretowane są godziny pracy Tech Baru.`
+                })
               ]
             },
             {

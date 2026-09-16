@@ -38,7 +38,10 @@ const getFirstName = (displayName: string): string => {
 };
 
 const AiTechBar: React.FC<IAiTechBarProps> = (props) => {
-  const { hasTeamsContext, userDisplayName, settings, isEditMode, fullScreen, leftOffset, serviceScope, creditUpn } = props;
+  const {
+    hasTeamsContext, userDisplayName, userEmail, graphFactory, settings,
+    isEditMode, fullScreen, leftOffset, serviceScope, creditUpn
+  } = props;
   const canFullScreen = fullScreen && !isEditMode;
   const [fsOn, setFsOn] = React.useState<boolean>(true);
   const [showFsHint, setShowFsHint] = React.useState<boolean>(false);
@@ -337,7 +340,12 @@ const AiTechBar: React.FC<IAiTechBarProps> = (props) => {
           <StrefaSzkolen settings={settings} />
           <CelSection onSelectGoal={scrollToSection} />
           <ToolsCarousel settings={settings} />
-          <BookingSection settings={settings} />
+          <BookingSection
+            settings={settings}
+            graphFactory={graphFactory}
+            userDisplayName={userDisplayName}
+            userEmail={userEmail}
+          />
           <NewsSection settings={settings} />
           <PolicySection settings={settings} />
         </div>

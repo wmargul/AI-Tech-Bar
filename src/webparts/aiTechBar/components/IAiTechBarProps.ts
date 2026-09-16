@@ -1,4 +1,5 @@
 import { ServiceScope } from '@microsoft/sp-core-library';
+import { MSGraphClientFactory } from '@microsoft/sp-http';
 import { IResolvedSettings } from './data/config';
 
 export interface IAiTechBarProps {
@@ -7,6 +8,10 @@ export interface IAiTechBarProps {
   environmentMessage: string;
   hasTeamsContext: boolean;
   userDisplayName: string;
+  /** E-mail zalogowanego użytkownika — prefill danych rezerwacji. */
+  userEmail: string;
+  /** Fabryka klienta Graph — rezerwacja wizyt (Bookings, free/busy). */
+  graphFactory?: MSGraphClientFactory;
   settings: IResolvedSettings;
   /** ServiceScope web partu — wymagany przez kartę osoby (LivePersonaCard). */
   serviceScope: ServiceScope;
