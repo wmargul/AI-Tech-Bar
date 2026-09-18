@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<App xmlns="http://schemas.microsoft.com/sharepoint/2012/app/manifest" Name="AI Tech Bar" ProductID="ec812fbd-50d2-42d1-ab7f-67197bdf8bfb" SharePointMinVersion="16.0.0.0" IsClientSideSolution="true" Version="1.2.0.0" SkipFeatureDeployment="true" IsDomainIsolated="false">
+  <Properties>
+    <Title>AI Tech Bar</Title>
+    <DeveloperProperties>{&quot;name&quot;:&quot;Warner Bros. Discovery — AI Tech Bar&quot;,&quot;websiteUrl&quot;:&quot;&quot;,&quot;privacyUrl&quot;:&quot;&quot;,&quot;termsOfUseUrl&quot;:&quot;&quot;,&quot;mpnId&quot;:&quot;Undefined-1.22.2&quot;}</DeveloperProperties>
+    <ShortDescription>
+      <LocalizedString CultureName="default">Strona programu AI Tech Bar: szkolenia, narzędzia AI, aktualności, polityka AI i rezerwacja wizyt z ekspertem.</LocalizedString>
+    </ShortDescription>
+    <LongDescription>
+      <LocalizedString CultureName="default">Web part prezentujący program AI Tech Bar w intranecie: strefę szkoleń, katalog zatwierdzonych narzędzi AI, aktualności i politykę AI. Umożliwia też zapisanie się na 30-minutową wizytę z ekspertem w Krakowie lub Warszawie bezpośrednio na stronie, bez przechodzenia do zewnętrznej strony Microsoft Bookings. Rezerwacja korzysta z delegowanych uprawnień Microsoft Graph i działa w imieniu zalogowanego użytkownika.</LocalizedString>
+    </LongDescription>
+    <Screenshots/>
+  </Properties>
+  <WebApiPermissionRequests>
+    <WebApiPermissionRequest ResourceId="Microsoft Graph" Scope="Bookings.Read.All"/>
+    <WebApiPermissionRequest ResourceId="Microsoft Graph" Scope="BookingsAppointment.ReadWrite.All"/>
+    <WebApiPermissionRequest ResourceId="Microsoft Graph" Scope="Calendars.Read"/>
+  </WebApiPermissionRequests>
+</App>

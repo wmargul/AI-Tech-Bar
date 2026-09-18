@@ -22,11 +22,11 @@
   "preconfiguredEntries": [{
     "groupId": "5c03119e-3074-46fd-976b-c60198311f70", // Advanced
     "group": { "default": "Advanced" },
-    "title": { "default": "AITechBar" },
-    "description": { "default": "AITechBar description" },
-    "officeFabricIconFontName": "Page",
+    "title": { "default": "AI Tech Bar" },
+    "description": { "default": "Strona programu AI Tech Bar: szkolenia, narzędzia AI, aktualności, polityka AI i rezerwacja wizyt z ekspertem." },
+    "officeFabricIconFontName": "Robot",
     "properties": {
-      "description": "AITechBar",
+      "description": "AI Tech Bar",
       "fullScreen": true,
       "leftOffset": 0
     }

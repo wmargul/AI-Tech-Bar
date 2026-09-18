@@ -1,14 +1,14 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "ai-tech-bar-client-side-solution",
+    "name": "AI Tech Bar",
     "id": "ec812fbd-50d2-42d1-ab7f-67197bdf8bfb",
     "version": "1.2.0.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
     "developer": {
-      "name": "",
+      "name": "Warner Bros. Discovery — AI Tech Bar",
       "websiteUrl": "",
       "privacyUrl": "",
       "termsOfUseUrl": "",
@@ -16,10 +16,10 @@
     },
     "metadata": {
       "shortDescription": {
-        "default": "ai-tech-bar description"
+        "default": "Strona programu AI Tech Bar: szkolenia, narzędzia AI, aktualności, polityka AI i rezerwacja wizyt z ekspertem."
       },
       "longDescription": {
-        "default": "ai-tech-bar description"
+        "default": "Web part prezentujący program AI Tech Bar w intranecie: strefę szkoleń, katalog zatwierdzonych narzędzi AI, aktualności i politykę AI. Umożliwia też zapisanie się na 30-minutową wizytę z ekspertem w Krakowie lub Warszawie bezpośrednio na stronie, bez przechodzenia do zewnętrznej strony Microsoft Bookings. Rezerwacja korzysta z delegowanych uprawnień Microsoft Graph i działa w imieniu zalogowanego użytkownika."
       },
       "screenshotPaths": [],
       "videoUrl": "",
