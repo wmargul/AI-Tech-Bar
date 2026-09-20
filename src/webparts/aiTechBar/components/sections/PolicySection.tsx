@@ -30,13 +30,23 @@ const PolicySection: React.FC<IPolicySectionProps> = ({ settings }) => {
         <div className={`${styles.policyCard} ${styles.policyCardWide}`}>
           <h3 className={styles.policyTitle}>{t.policy.policyTitle}</h3>
           <ul className={`${styles.policyList} ${styles.policyListWide}`}>
-            {POLICY_RULES.map((rule, i) => (
-              <li key={i} className={styles.policyItem} style={{ animationDelay: `${i * 90}ms` }}>
-                <span className={styles.policyIcon}>{rule.icon}</span>
-                <span className={styles.policyText}>{t.policyRules[i] || rule.text}</span>
-              </li>
-            ))}
+            {POLICY_RULES.map((rule, i) => {
+              const copy = t.policyRules[i];
+              return (
+                <li key={i} className={styles.policyItem} style={{ animationDelay: `${i * 90}ms` }}>
+                  <span className={styles.policyIcon}>{rule.icon}</span>
+                  <span className={styles.policyBody}>
+                    <span className={styles.policyRuleNo}>{`0${i + 1}`}</span>
+                    {copy && <span className={styles.policyRuleTitle}>{copy.title}</span>}
+                    <span className={styles.policyText}>{copy ? copy.text : rule.text}</span>
+                  </span>
+                </li>
+              );
+            })}
           </ul>
+
+          <p className={styles.policyNote}>{t.policy.policyNote}</p>
+
           <button
             type="button"
             className={styles.policyLink}

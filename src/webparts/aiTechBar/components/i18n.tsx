@@ -54,7 +54,7 @@ export interface IStrings {
   };
   policy: {
     kicker: string; title: ITitleParts; lead: string;
-    policyTitle: string; policyLink: string;
+    policyTitle: string; policyLink: string; policyNote: string;
   };
   bookingFlow: {
     eyebrow: string; title: string; close: string;
@@ -86,7 +86,7 @@ export interface IStrings {
   toolText: { [id: string]: IToolText };
   goalText: { [id: string]: IGoalText };
   newsText: { [id: string]: INewsText };
-  policyRules: string[];
+  policyRules: { title: string; text: string }[];
 }
 
 const PL: IStrings = {
@@ -182,9 +182,10 @@ const PL: IStrings = {
   policy: {
     kicker: '#06 · Polityka AI',
     title: { pre: 'Korzystaj z AI ', grad: 'bezpiecznie', post: '' },
-    lead: 'Cztery zasady, które chronią Ciebie i firmę. Poznaj je, zanim zaczniesz pracę z narzędziami AI.',
+    lead: 'Zasady, które chronią Ciebie i firmę. Poznaj je, zanim zaczniesz pracę z narzędziami AI.',
     policyTitle: 'Zasady korzystania z AI',
-    policyLink: 'Przeczytaj pełną Politykę AI'
+    policyLink: 'Przeczytaj pełną Politykę AI',
+    policyNote: 'To skrót najważniejszych zasad. Pełna Polityka AI zawiera szczegóły, wyjątki i przykłady zastosowania.'
   },
   bookingFlow: {
     eyebrow: 'AI Tech Bar · Rezerwacja',
@@ -323,10 +324,22 @@ const PL: IStrings = {
     }
   },
   policyRules: [
-    'Traktuj AI jako pomocnika — ostateczna decyzja i odpowiedzialność zawsze należą do Ciebie.',
-    'Nie wprowadzaj do narzędzi AI danych osobowych (klientów, pracowników, partnerów), informacji poufnych ani tajemnic firmy.',
-    'Każdy wynik wygenerowany przez AI musi zostać sprawdzony i zweryfikowany przed wysłaniem lub publikacją.',
-    'Korzystaj wyłącznie z narzędzi AI zatwierdzonych i dostępnych w WBD; użycie innych narzędzi wymaga wcześniejszego zatwierdzenia.'
+    {
+      title: 'Decyzja należy do Ciebie',
+      text: 'Traktuj AI jako pomocnika — ostateczna decyzja i odpowiedzialność zawsze należą do Ciebie.'
+    },
+    {
+      title: 'Żadnych danych poufnych',
+      text: 'Nie wprowadzaj do narzędzi AI danych osobowych (klientów, pracowników, partnerów), informacji poufnych ani tajemnic firmy.'
+    },
+    {
+      title: 'Sprawdź każdy wynik',
+      text: 'Każdy wynik wygenerowany przez AI musi zostać sprawdzony i zweryfikowany przed wysłaniem lub publikacją.'
+    },
+    {
+      title: 'Tylko zatwierdzone narzędzia',
+      text: 'Korzystaj wyłącznie z narzędzi AI zatwierdzonych i dostępnych w WBD; użycie innych narzędzi wymaga wcześniejszego zatwierdzenia.'
+    }
   ]
 };
 
@@ -423,9 +436,10 @@ const EN: IStrings = {
   policy: {
     kicker: '#06 · AI Policy',
     title: { pre: 'Use AI ', grad: 'safely', post: '' },
-    lead: 'Four rules that protect you and the company. Get to know them before you start working with AI tools.',
+    lead: 'Rules that protect you and the company. Get to know them before you start working with AI tools.',
     policyTitle: 'AI usage rules',
-    policyLink: 'Read the full AI Policy'
+    policyLink: 'Read the full AI Policy',
+    policyNote: 'This is a summary of the key rules. The full AI Policy covers the details, exceptions and worked examples.'
   },
   bookingFlow: {
     eyebrow: 'AI Tech Bar · Booking',
@@ -564,10 +578,22 @@ const EN: IStrings = {
     }
   },
   policyRules: [
-    'Treat AI as an assistant — the final decision and responsibility are always yours.',
-    'Do not enter personal data (clients, employees, partners), confidential information or company secrets into AI tools.',
-    'Every AI-generated result must be checked and verified before it is sent or published.',
-    'Use only AI tools approved and available at WBD; using any other tools requires prior approval.'
+    {
+      title: 'The decision is yours',
+      text: 'Treat AI as an assistant — the final decision and responsibility are always yours.'
+    },
+    {
+      title: 'No confidential data',
+      text: 'Do not enter personal data (clients, employees, partners), confidential information or company secrets into AI tools.'
+    },
+    {
+      title: 'Verify every result',
+      text: 'Every AI-generated result must be checked and verified before it is sent or published.'
+    },
+    {
+      title: 'Approved tools only',
+      text: 'Use only AI tools approved and available at WBD; using any other tools requires prior approval.'
+    }
   ]
 };
 

@@ -72,7 +72,8 @@ export interface INewsItem {
 // --- Globalne linki (podmień na docelowe) --------------------------------------
 export const LINKS = {
   booking: '#',          // Strona rezerwacji wizyt w AI Tech Bar
-  policyFull: '#',       // Pełna Polityka AI (nowa karta)
+  // Pełna Polityka AI — artykuł w bazie wiedzy ServiceNow (nowa karta)
+  policyFull: 'https://wbd.service-now.com/one?id=kb_article&sysparm_article=KB0018902',
   allTools: '#',         // Pełna lista narzędzi AI
   videoTraining: '#',    // Szkolenia wideo
   prompts: '#',          // Prompty & Triki
