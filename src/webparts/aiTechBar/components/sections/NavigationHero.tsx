@@ -39,7 +39,7 @@ const NavigationHero: React.FC<INavigationHeroProps> = ({ firstName, onNavigate 
         <button
           type="button"
           className={styles.scrollHint}
-          onClick={() => onNavigate('sec-szkolenia')}
+          onClick={() => onNavigate(NAV_ITEMS[0].targetId)}
         >
           {t.hero.scrollHint}
           <span className={styles.scrollCaret} />

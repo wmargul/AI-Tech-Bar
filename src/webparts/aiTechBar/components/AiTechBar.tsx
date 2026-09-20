@@ -20,12 +20,12 @@ import NewsSection from './sections/NewsSection';
 // Kolejność paneli full-page (jeden gest scrolla = jeden panel).
 const SECTION_ORDER = [
   'sec-hero',
+  'sec-policy',
   'sec-szkolenia',
   'sec-cel',
   'sec-tools',
   'sec-booking',
-  'sec-news',
-  'sec-policy'
+  'sec-news'
 ];
 
 const getFirstName = (displayName: string): string => {
@@ -337,6 +337,7 @@ const AiTechBar: React.FC<IAiTechBarProps> = (props) => {
         <div ref={pageRef} className={styles.page}>
           <NavBar scrollContainer={landingRef} onNavigate={scrollToSection} leftSlot={leftSlot} />
           <NavigationHero firstName={firstName} onNavigate={scrollToSection} />
+          <PolicySection settings={settings} />
           <StrefaSzkolen settings={settings} />
           <CelSection onSelectGoal={scrollToSection} />
           <ToolsCarousel settings={settings} />
@@ -347,7 +348,6 @@ const AiTechBar: React.FC<IAiTechBarProps> = (props) => {
             userEmail={userEmail}
           />
           <NewsSection settings={settings} />
-          <PolicySection settings={settings} />
         </div>
       </div>
 

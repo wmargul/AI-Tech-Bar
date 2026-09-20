@@ -272,12 +272,12 @@ export const STATS: IStat[] = [
 
 // --- Pozycje nawigacji (kolejność sekcji) --------------------------------------
 export const NAV_ITEMS: INavItem[] = [
-  { index: '01', label: 'Strefa Szkoleń', targetId: 'sec-szkolenia' },
-  { index: '02', label: 'Cel', targetId: 'sec-cel' },
-  { index: '03', label: 'Narzędzia AI', targetId: 'sec-tools' },
-  { index: '04', label: 'Tech Bar', targetId: 'sec-booking' },
-  { index: '05', label: 'News', targetId: 'sec-news' },
-  { index: '06', label: 'Polityka AI', targetId: 'sec-policy' }
+  { index: '01', label: 'Polityka AI', targetId: 'sec-policy' },
+  { index: '02', label: 'Strefa Szkoleń', targetId: 'sec-szkolenia' },
+  { index: '03', label: 'Cel', targetId: 'sec-cel' },
+  { index: '04', label: 'Narzędzia AI', targetId: 'sec-tools' },
+  { index: '05', label: 'Tech Bar', targetId: 'sec-booking' },
+  { index: '06', label: 'News', targetId: 'sec-news' }
 ];
 
 // --- Zasady korzystania z AI ---------------------------------------------------

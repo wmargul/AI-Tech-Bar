@@ -113,16 +113,16 @@ const PL: IStrings = {
     scrollHint: 'Scrolluj, żeby zacząć',
     statLabels: ['narzędzi AI w stacku', 'ścieżki szkoleniowe', 'sesje w AI Tech Bar'],
     navLabels: {
+      'sec-policy': 'Polityka AI',
       'sec-szkolenia': 'Strefa Szkoleń',
       'sec-cel': 'Cel',
       'sec-tools': 'Narzędzia AI',
       'sec-booking': 'Tech Bar',
-      'sec-news': 'News',
-      'sec-policy': 'Polityka AI'
+      'sec-news': 'News'
     }
   },
   szkolenia: {
-    kicker: '#01 · Strefa Szkoleń',
+    kicker: '#02 · Strefa Szkoleń',
     title: { pre: 'Ucz się ', grad: 'we własnym tempie', post: '' },
     lead: 'Wideo na start i biblioteka sprawdzonych promptów — wszystko, by szybko wejść w temat.',
     videoBadge: 'Wideo',
@@ -151,7 +151,7 @@ const PL: IStrings = {
     carouselUpNext: 'W kolejce'
   },
   cel: {
-    kicker: '#02 · Cel',
+    kicker: '#03 · Cel',
     title: { pre: 'Wybierz cel — ', grad: 'dopasujemy narzędzie', post: '' },
     lead: 'Powiedz, co chcesz osiągnąć. My wskażemy najlepsze narzędzie AI do zadania.',
     matchCta: 'Dopasuj narzędzie',
@@ -160,7 +160,7 @@ const PL: IStrings = {
     discoverHint: 'Kliknij, aby zobaczyć wszystkie cele'
   },
   tools: {
-    kicker: '#03 · Narzędzia AI',
+    kicker: '#04 · Narzędzia AI',
     title: { pre: 'Twój ', grad: 'stack narzędzi', post: ' AI' },
     lead: 'Przeglądaj zatwierdzone narzędzia. Otwórz aplikację albo złóż wniosek o dostęp.',
     searchPlaceholder: 'Szukaj narzędzia…',
@@ -171,7 +171,7 @@ const PL: IStrings = {
     clearFilters: 'Wyczyść filtry'
   },
   booking: {
-    kicker: '#04 · Tech Bar',
+    kicker: '#05 · Tech Bar',
     title: { pre: 'Wpadnij do ', grad: 'AI Tech Bar', post: '' },
     lead: 'Zarezerwuj sesję 1:1 z ekspertem i wyjdź z gotowym planem wdrożenia AI w swojej pracy.',
     bookingPill: 'Booking',
@@ -180,7 +180,7 @@ const PL: IStrings = {
     bookingGo: 'Przejdź'
   },
   policy: {
-    kicker: '#06 · Polityka AI',
+    kicker: '#01 · Polityka AI',
     title: { pre: 'Korzystaj z AI ', grad: 'bezpiecznie', post: '' },
     lead: 'Zasady, które chronią Ciebie i firmę. Poznaj je, zanim zaczniesz pracę z narzędziami AI.',
     policyTitle: 'Zasady korzystania z AI',
@@ -241,7 +241,7 @@ const PL: IStrings = {
     openOriginal: 'Otwórz stronę rezerwacji'
   },
   news: {
-    kicker: '#05 · News',
+    kicker: '#06 · News',
     title: { pre: 'Co ', grad: 'nowego', post: ' w AI' },
     lead: 'Wdrożenia, nowe narzędzia i zmiany w zasadach — wszystko, co warto wiedzieć na bieżąco.',
     readCta: 'Czytaj więcej',
@@ -367,16 +367,16 @@ const EN: IStrings = {
     scrollHint: 'Scroll to begin',
     statLabels: ['AI tools in the stack', 'learning paths', 'sessions at AI Tech Bar'],
     navLabels: {
+      'sec-policy': 'AI Policy',
       'sec-szkolenia': 'Training Zone',
       'sec-cel': 'Goal',
       'sec-tools': 'AI Tools',
       'sec-booking': 'Tech Bar',
-      'sec-news': 'News',
-      'sec-policy': 'AI Policy'
+      'sec-news': 'News'
     }
   },
   szkolenia: {
-    kicker: '#01 · Training Zone',
+    kicker: '#02 · Training Zone',
     title: { pre: 'Learn ', grad: 'at your own pace', post: '' },
     lead: 'Videos to get started and a library of proven prompts — everything to get up to speed fast.',
     videoBadge: 'Video',
@@ -405,7 +405,7 @@ const EN: IStrings = {
     carouselUpNext: 'Up next'
   },
   cel: {
-    kicker: '#02 · Goal',
+    kicker: '#03 · Goal',
     title: { pre: 'Pick a goal — ', grad: "we'll match the tool", post: '' },
     lead: "Tell us what you want to achieve. We'll point you to the best AI tool for the job.",
     matchCta: 'Match a tool',
@@ -414,7 +414,7 @@ const EN: IStrings = {
     discoverHint: 'Click to reveal all goals'
   },
   tools: {
-    kicker: '#03 · AI Tools',
+    kicker: '#04 · AI Tools',
     title: { pre: 'Your AI ', grad: 'tool stack', post: '' },
     lead: 'Browse approved tools. Open the app or request access.',
     searchPlaceholder: 'Search a tool…',
@@ -425,7 +425,7 @@ const EN: IStrings = {
     clearFilters: 'Clear filters'
   },
   booking: {
-    kicker: '#04 · Tech Bar',
+    kicker: '#05 · Tech Bar',
     title: { pre: 'Drop by the ', grad: 'AI Tech Bar', post: '' },
     lead: 'Book a 1:1 session with an expert and leave with a ready plan for using AI in your work.',
     bookingPill: 'Booking',
@@ -434,7 +434,7 @@ const EN: IStrings = {
     bookingGo: 'Go'
   },
   policy: {
-    kicker: '#06 · AI Policy',
+    kicker: '#01 · AI Policy',
     title: { pre: 'Use AI ', grad: 'safely', post: '' },
     lead: 'Rules that protect you and the company. Get to know them before you start working with AI tools.',
     policyTitle: 'AI usage rules',
@@ -495,7 +495,7 @@ const EN: IStrings = {
     openOriginal: 'Open the booking page'
   },
   news: {
-    kicker: '#05 · News',
+    kicker: '#06 · News',
     title: { pre: "What's ", grad: 'new', post: ' in AI' },
     lead: 'Rollouts, new tools and policy changes — everything worth knowing, as it happens.',
     readCta: 'Read more',
