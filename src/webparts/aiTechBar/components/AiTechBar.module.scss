@@ -2574,12 +2574,12 @@
 
 .policyText { padding-top: 5px; }
 
-// Podgląd polityki czyta się jak notka informacyjna: numer i krótki nagłówek
-// do skanowania wzrokiem, pod spodem pełne brzmienie zasady.
+// Podgląd polityki czyta się jak notka informacyjna: krótki nagłówek do
+// skanowania wzrokiem, pod spodem pełne brzmienie zasady.
 .policyBody {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -2587,13 +2587,6 @@
   padding-top: 0;
   font-size: 13.5px;
   color: var(--c-text-faint);
-}
-
-.policyRuleNo {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: #6ee7ff;
 }
 
 .policyRuleTitle {
