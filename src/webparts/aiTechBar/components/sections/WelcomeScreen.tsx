@@ -539,33 +539,73 @@ const WelcomeScreen: React.FC<IWelcomeScreenProps> = ({ onStart, onFinish, lang,
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion) return undefined;
 
+    let disposed = false;
+
+    // Canvas z tytułem buduje się dopiero po wczytaniu fontu — rozpoznajemy to
+    // po szerokości nadanej w build().
+    const fxReady = (): boolean => {
+      const fx = titleFxRef.current;
+      return !!fx && parseFloat(fx.style.width || '0') > 4;
+    };
+
+    const swapToCanvas = (duration: number): void => {
+      if (!titleFxRef.current) return;
+      gsap.to(titleRef.current, { opacity: 0, duration, ease: 'power2.inOut' });
+      gsap.to(titleFxRef.current, { opacity: 1, duration, ease: 'power2.inOut' });
+    };
+
     const ctx = gsap.context(() => {
-      gsap.set('.' + styles.titleChar, { opacity: 0, y: 56, rotateX: -30 });
+      const parts = ([
+        eyebrowRef.current,
+        titleWrapRef.current,
+        subtitleRef.current,
+        buttonRef.current,
+        hintRef.current,
+        creditRef.current,
+        langRef.current
+      ] as (Element | null)[]).filter((el): el is Element => !!el);
+
+      gsap.set(parts, { opacity: 0, y: 14, filter: 'blur(6px)' });
       if (titleFxRef.current) gsap.set(titleFxRef.current, { opacity: 0 });
-      gsap.set(eyebrowRef.current, { opacity: 0, y: 18 });
-      gsap.set(subtitleRef.current, { opacity: 0, y: 20 });
-      gsap.set(buttonRef.current, { opacity: 0, y: 22, scale: 0.94 });
-      if (hintRef.current) gsap.set(hintRef.current, { opacity: 0, y: 8 });
-      if (creditRef.current) gsap.set(creditRef.current, { opacity: 0, y: 6 });
-      if (langRef.current) gsap.set(langRef.current, { opacity: 0, y: 6 });
 
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.15 });
-      tl.to(eyebrowRef.current, { opacity: 1, y: 0, duration: 0.7 })
-        .to('.' + styles.titleChar, { opacity: 1, y: 0, rotateX: 0, duration: 1.05, stagger: 0.025, ease: 'expo.out' }, '-=0.4')
-        .to(subtitleRef.current, { opacity: 1, y: 0, duration: 0.7 }, '-=0.6')
-        .to(buttonRef.current, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.4)' }, '-=0.4');
-      if (hintRef.current) tl.to(hintRef.current, { opacity: 1, y: 0, duration: 0.5 }, '-=0.3');
-      if (creditRef.current) tl.to(creditRef.current, { opacity: 1, y: 0, duration: 0.5 }, '-=0.35');
-      if (langRef.current) tl.to(langRef.current, { opacity: 1, y: 0, duration: 0.5 }, '-=0.4');
+      const tl = gsap.timeline({ delay: 0.12 });
 
-      // Płynna podmiana statycznego <h1> na interaktywną wersję canvas (hover-ready).
-      if (titleFxRef.current) {
-        tl.to(titleRef.current, { opacity: 0, duration: 0.45, ease: 'power2.inOut' }, '-=0.15')
-          .to(titleFxRef.current, { opacity: 1, duration: 0.45, ease: 'power2.inOut' }, '<');
+      // Podmiana statycznego <h1> na wersję canvas jeszcze zanim tytuł stanie
+      // się widoczny — wcześniej działa się na końcu sekwencji i było widać,
+      // jak napis zmienia się po ustawieniu całej reszty.
+      tl.add(() => {
+        if (fxReady()) { swapToCanvas(0); return; }
+        let tries = 0;
+        const wait = (): void => {
+          if (disposed) return;
+          if (fxReady()) { swapToCanvas(0.4); return; }
+          tries += 1;
+          if (tries < 180) requestAnimationFrame(wait);
+        };
+        requestAnimationFrame(wait);
+      });
+
+      // Wszystkie elementy wchodzą razem: delikatne podniesienie i wyostrzenie.
+      tl.to(parts, {
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        duration: 0.8,
+        ease: 'power2.out',
+        clearProps: 'filter'
+      });
+
+      if (buttonRef.current) {
+        tl.fromTo(
+          buttonRef.current,
+          { scale: 0.96 },
+          { scale: 1, duration: 0.8, ease: 'back.out(1.6)' },
+          '<'
+        );
       }
     }, rootRef);
 
-    return () => ctx.revert();
+    return () => { disposed = true; ctx.revert(); };
   }, []);
 
   // ---- magnes na przycisku ----
