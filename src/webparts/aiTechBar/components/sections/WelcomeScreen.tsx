@@ -533,7 +533,10 @@ const WelcomeScreen: React.FC<IWelcomeScreenProps> = ({ onStart, onFinish, lang,
   }, [titleWords]);
 
   // ---- wejście (reveal) ----
-  React.useEffect(() => {
+  // useLayoutEffect, a nie useEffect: stan początkowy musi trafić na elementy
+  // przed pierwszym malowaniem, inaczej widać klatkę z gotowym ekranem, który
+  // dopiero potem znika i wjeżdża od nowa.
+  React.useLayoutEffect(() => {
     const reduceMotion =
       typeof window !== 'undefined' && window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -565,10 +568,13 @@ const WelcomeScreen: React.FC<IWelcomeScreenProps> = ({ onStart, onFinish, lang,
         langRef.current
       ] as (Element | null)[]).filter((el): el is Element => !!el);
 
-      gsap.set(parts, { opacity: 0, y: 14, filter: 'blur(6px)' });
+      // Bez skalowania: build() canvasu z tytułem mierzy nagłówek przez
+      // getBoundingClientRect(), więc skala rozjechałaby nakładkę. Przesunięcie
+      // w pionie i rozmycie nie zmieniają wymiarów, więc są bezpieczne.
+      gsap.set(parts, { opacity: 0, y: 28, filter: 'blur(10px)' });
       if (titleFxRef.current) gsap.set(titleFxRef.current, { opacity: 0 });
 
-      const tl = gsap.timeline({ delay: 0.12 });
+      const tl = gsap.timeline({ delay: 0.25 });
 
       // Podmiana statycznego <h1> na wersję canvas jeszcze zanim tytuł stanie
       // się widoczny — wcześniej działa się na końcu sekwencji i było widać,
@@ -585,24 +591,17 @@ const WelcomeScreen: React.FC<IWelcomeScreenProps> = ({ onStart, onFinish, lang,
         requestAnimationFrame(wait);
       });
 
-      // Wszystkie elementy wchodzą razem: delikatne podniesienie i wyostrzenie.
+      // Wszystkie elementy wchodzą razem. `power2.inOut` zamiast `.out`, bo
+      // wersje wychodzące zużywają ruch w pierwszych klatkach i mimo długiego
+      // czasu trwania czyta się to jako szarpnięcie.
       tl.to(parts, {
         opacity: 1,
         y: 0,
         filter: 'blur(0px)',
-        duration: 0.8,
-        ease: 'power2.out',
+        duration: 1,
+        ease: 'power2.inOut',
         clearProps: 'filter'
       });
-
-      if (buttonRef.current) {
-        tl.fromTo(
-          buttonRef.current,
-          { scale: 0.96 },
-          { scale: 1, duration: 0.8, ease: 'back.out(1.6)' },
-          '<'
-        );
-      }
     }, rootRef);
 
     return () => { disposed = true; ctx.revert(); };
