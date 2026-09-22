@@ -74,7 +74,8 @@ export const LINKS = {
   booking: '#',          // Strona rezerwacji wizyt w AI Tech Bar
   // Pełna Polityka AI — artykuł w bazie wiedzy ServiceNow (nowa karta)
   policyFull: 'https://wbd.service-now.com/one?id=kb_article&sysparm_article=KB0018902',
-  allTools: '#',         // Pełna lista narzędzi AI
+  // Pełny katalog zatwierdzonych narzędzi AI (WBD AI Central)
+  allTools: 'https://warnermedia.sharepoint.com/sites/WBDAICentral/SitePages/Available%20Gen%20AI%20Applications.aspx',
   videoTraining: '#',    // Szkolenia wideo
   prompts: '#',          // Prompty & Triki
   news: '#'              // Pełna lista aktualności AI
@@ -105,8 +106,8 @@ export const TOOLS: ITool[] = [
     badge: 'CP',
     accent: 'linear-gradient(135deg, #2f6bff 0%, #22d3ee 100%)',
     tags: ['Pisanie', 'Analiza danych', 'M365'],
-    openUrl: '#',
-    requestUrl: '#'
+    openUrl: 'https://m365.cloud.microsoft/chat?auth=2',
+    requestUrl: 'https://forms.cloud.microsoft/pages/responsepage.aspx?id=JYi0DnHoWUS8ctDs1o8fOWwdbC6xWpZKl-710_iPYwtUMDZaNlhDS0oxS1BJRlQ1OU03RTlSWElLOSQlQCN0PWcu&route=shorturl'
   },
   {
     id: 'promptly',
@@ -116,8 +117,8 @@ export const TOOLS: ITool[] = [
     badge: 'PR',
     accent: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
     tags: ['Transkrypcje', 'Spotkania'],
-    openUrl: '#',
-    requestUrl: '#'
+    openUrl: 'https://promptly.int.tvn.pl/pl/accounts/login/',
+    requestUrl: 'https://iam/form/subject'
   },
   {
     id: 'zoom-ai',
@@ -127,8 +128,8 @@ export const TOOLS: ITool[] = [
     badge: 'ZM',
     accent: 'linear-gradient(135deg, #2f6bff 0%, #6366f1 100%)',
     tags: ['Spotkania', 'Notatki'],
-    openUrl: '#',
-    requestUrl: '#'
+    openUrl: 'https://ai.zoom.us/',
+    requestUrl: 'https://forms.cloud.microsoft/pages/responsepage.aspx?id=JYi0DnHoWUS8ctDs1o8fOdQvZgL3SadCjXTfDkwVRTlUNlJJMk02TVcwNlNFNkszWDBaS1QySTRNRSQlQCN0PWcu&route=shorturl'
   },
   {
     id: 'canva-ai',
@@ -138,8 +139,8 @@ export const TOOLS: ITool[] = [
     badge: 'CV',
     accent: 'linear-gradient(135deg, #22d3ee 0%, #818cf8 100%)',
     tags: ['Design', 'Grafika'],
-    openUrl: '#',
-    requestUrl: '#'
+    openUrl: 'https://www.canva.com/',
+    requestUrl: 'https://wbd.service-now.com/one?id=sc_cat_item&table=sc_cat_item&sys_id=e0412bef1b05969062cb2139b04bcb73&searchTerm=canva'
   },
   {
     id: 'miro-ai',
@@ -149,8 +150,8 @@ export const TOOLS: ITool[] = [
     badge: 'MR',
     accent: 'linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)',
     tags: ['Design', 'Współpraca'],
-    openUrl: '#',
-    requestUrl: '#'
+    openUrl: 'https://miro.com/',
+    requestUrl: 'https://wbd.service-now.com/one?id=sc_cat_item&sys_id=dab7f2e21be7a950a8128550cd4bcb01'
   },
   {
     id: 'github-copilot',
@@ -160,8 +161,8 @@ export const TOOLS: ITool[] = [
     badge: 'GH',
     accent: 'linear-gradient(135deg, #6366f1 0%, #0ea5e9 100%)',
     tags: ['Kod', 'Programowanie'],
-    openUrl: '#',
-    requestUrl: '#'
+    openUrl: 'https://github.com/copilot',
+    requestUrl: 'https://forms.cloud.microsoft/pages/responsepage.aspx?id=JYi0DnHoWUS8ctDs1o8fOc5Q2lBl4VJNqD9iZKlODXJUNVhQS1g2UkhXNTJZTkxZOVlYSkwyQVZGOCQlQCN0PWcu&route=shorturl'
   },
   {
     id: 'cursor',
@@ -171,8 +172,8 @@ export const TOOLS: ITool[] = [
     badge: 'CR',
     accent: 'linear-gradient(135deg, #a855f7 0%, #22d3ee 100%)',
     tags: ['Kod', 'Programowanie'],
-    openUrl: '#',
-    requestUrl: '#'
+    openUrl: 'https://cursor.com/agents',
+    requestUrl: 'https://forms.cloud.microsoft/pages/responsepage.aspx?id=JYi0DnHoWUS8ctDs1o8fOe-E3K0lIAROr8C14OK_p-dUQVRDMjJaUUQ4TTRDWUpJT1lPUjBYSU8yMi4u&route=shorturl'
   },
   {
     id: 'claude',
@@ -182,8 +183,8 @@ export const TOOLS: ITool[] = [
     badge: 'CL',
     accent: 'linear-gradient(135deg, #d97757 0%, #f59e0b 100%)',
     tags: ['Pisanie', 'Analiza danych', 'Programowanie', 'Kod'],
-    openUrl: '#',
-    requestUrl: '#'
+    openUrl: 'https://claude.ai/login',
+    requestUrl: 'https://forms.cloud.microsoft/pages/responsepage.aspx?id=JYi0DnHoWUS8ctDs1o8fOe-E3K0lIAROr8C14OK_p-dURVRXTkpVME02Q1lYSVMwWllaQzg1OFoyRi4u&route=shorturl'
   },
   {
     id: 'all-tools',
