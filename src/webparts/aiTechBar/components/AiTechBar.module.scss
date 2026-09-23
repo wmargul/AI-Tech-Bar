@@ -2,7 +2,14 @@
 // AI TECH BAR — premium enterprise styles (jeden współdzielony moduł)
 // =============================================================================
 
-.app {
+// Tokeny projektu.
+//
+// Muszą dać się powtórzyć poza .app, bo nakładki renderują się portalem do
+// <body>. Tam żadna z tych zmiennych nie jest widoczna, więc każde var(--...)
+// w środku jest nieprawidłowe: tekst spada na domyślną, szeryfową czcionkę
+// przeglądarki, a kolory na dziedziczone ze strony SharePointa. Korzeń każdej
+// nakładki włącza ten mixin — inaczej wygląda jak obcy element.
+@mixin design-tokens {
   --c-bg-0: #0a0a16;
   --c-bg-1: #141033;
   --c-bg-2: #0d2a33;
@@ -15,6 +22,10 @@
   --c-card-border: rgba(255, 255, 255, 0.1);
   --font: "Segoe UI", "Segoe UI Web (West European)", system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
   --mono: "SFMono-Regular", "Cascadia Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.app {
+  @include design-tokens;
 
   position: relative;
   width: 100%;
@@ -31,6 +42,14 @@
   *::before,
   *::after {
     box-sizing: border-box;
+  }
+
+  // Formularze nie dziedziczą kroju po rodzicu, tylko biorą systemowy.
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
   }
 
   &.teams {
@@ -3089,13 +3108,22 @@
 // VIDEO TRAINING CAROUSEL — hero coverflow (otwierany z kafelka „Szkolenia Wideo")
 // =============================================================================
 .vtcOverlay {
+  @include design-tokens;
+
   position: fixed;
   inset: 0;
   z-index: 999995;
   overflow: hidden;
   color: #fff;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font);
   background: #05070f;
+}
+
+.vtcOverlay button,
+.vtcOverlay input,
+.vtcOverlay select,
+.vtcOverlay textarea {
+  font-family: inherit;
 }
 
 .vtcBgs {
@@ -3568,17 +3596,22 @@
 }
 
 .peOverlay {
-  // portal renderuje do <body> (poza .app) — zmienne akcentu muszą być tutaj,
-  // inaczej gradienty (przyciski, kropki, nazwa) są niewidoczne.
-  --c-accent-from: #8b5cf6;
-  --c-accent-to: #22d3ee;
+  @include design-tokens;
+
   position: fixed;
   inset: 0;
   z-index: 999996;
   overflow: hidden;
   color: #fff;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font);
   background: #05070f;
+}
+
+.peOverlay button,
+.peOverlay input,
+.peOverlay select,
+.peOverlay textarea {
+  font-family: inherit;
 }
 
 .peStage {
@@ -3993,6 +4026,8 @@
 // REZERWACJA WIZYTY — overlay (Bookings przez Graph, bez opuszczania strony)
 // =============================================================================
 .bkOverlay {
+  @include design-tokens;
+
   position: fixed;
   inset: 0;
   z-index: 999997;
@@ -4001,7 +4036,14 @@
   justify-content: center;
   padding: 24px;
   color: var(--c-text);
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font);
+}
+
+.bkOverlay button,
+.bkOverlay input,
+.bkOverlay select,
+.bkOverlay textarea {
+  font-family: inherit;
 }
 
 .bkScrim {
@@ -4723,6 +4765,8 @@
 // z-index ponad .vtcOverlay (999995), bo otwiera się z jej wnętrza.
 // =============================================================================
 .tgOverlay {
+  @include design-tokens;
+
   position: fixed;
   inset: 0;
   z-index: 999998;
@@ -4730,6 +4774,15 @@
   align-items: center;
   justify-content: center;
   padding: 36px 24px;
+  font-family: var(--font);
+  color: var(--c-text);
+}
+
+.tgOverlay button,
+.tgOverlay input,
+.tgOverlay select,
+.tgOverlay textarea {
+  font-family: inherit;
 }
 
 .tgScrim {
@@ -5050,6 +5103,8 @@
 // wnętrza i musi lec na wierzchu.
 // =============================================================================
 .ggOverlay {
+  @include design-tokens;
+
   position: fixed;
   inset: 0;
   z-index: 999994;
@@ -5057,6 +5112,17 @@
   align-items: center;
   justify-content: center;
   padding: 36px 24px;
+  font-family: var(--font);
+  color: var(--c-text);
+}
+
+// Przyciski nie dziedziczą kroju po rodzicu — bez tego w nakładce zostają
+// przy domyślnej czcionce systemowej i odcinają się od reszty tekstu.
+.ggOverlay button,
+.ggOverlay input,
+.ggOverlay select,
+.ggOverlay textarea {
+  font-family: inherit;
 }
 
 .ggScrim {
