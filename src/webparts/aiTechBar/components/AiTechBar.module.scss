@@ -4764,6 +4764,15 @@
   background: linear-gradient(165deg, rgba(24, 28, 56, 0.96), rgba(12, 15, 34, 0.98));
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.5) transparent;
+}
+
+.tgPanel::-webkit-scrollbar { width: 8px; }
+.tgPanel::-webkit-scrollbar-track { background: transparent; }
+.tgPanel::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--c-accent-from), var(--c-accent-to));
+  border-radius: 8px;
 }
 
 // Cienki pasek w kolorze narzędzia — wiąże galerię z kartą, z której weszła.
@@ -5085,6 +5094,18 @@
   background: linear-gradient(165deg, rgba(24, 28, 56, 0.96), rgba(12, 15, 34, 0.98));
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.5) transparent;
+}
+
+// Domyślny pasek przewijania jest jasny i wybija się na ciemnym panelu —
+// ten sam zabieg co na .landing i .bkBody. Track jawnie przezroczysty, bo
+// samo ostylowanie kciuka zostawia w WebKicie jasne tło toru.
+.ggPanel::-webkit-scrollbar { width: 8px; }
+.ggPanel::-webkit-scrollbar-track { background: transparent; }
+.ggPanel::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--c-accent-from), var(--c-accent-to));
+  border-radius: 8px;
 }
 
 // --- nagłówek celu ------------------------------------------------------------
@@ -5229,12 +5250,17 @@
   color: var(--c-text-faint);
 }
 
+// Przewijany tylko awaryjnie, przy bardzo wąskim oknie — pasek pod dwiema
+// zakładkami wyglądałby jak usterka, więc go chowamy.
 .ggTabsRow {
   display: flex;
   gap: 8px;
   min-width: 0;
   overflow-x: auto;
+  scrollbar-width: none;
 }
+
+.ggTabsRow::-webkit-scrollbar { display: none; }
 
 .ggTab {
   position: relative;
