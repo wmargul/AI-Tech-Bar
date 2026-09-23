@@ -73,6 +73,7 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
   const [paused, setPaused] = React.useState<boolean>(false);
   const [galleryTool, setGalleryTool] = React.useState<ITool | undefined>(undefined);
   const [galleryOrigin, setGalleryOrigin] = React.useState<{ x: number; y: number } | undefined>(undefined);
+  const [tabHidden, setTabHidden] = React.useState<boolean>(false);
   const [dir, setDir] = React.useState<1 | -1>(1);
   const progressRef = React.useRef<number>(0);
   const [, force] = React.useState<number>(0);
@@ -140,6 +141,16 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
     e.preventDefault();
     runSearch();
   }, [runSearch]);
+
+  // Nagranie otwiera sie w nowej zakladce, wiec karuzela musi stanac takze
+  // wtedy, gdy nasza karta traci widocznosc — inaczej leci dalej w tle.
+  React.useEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+    const onVisibility = (): void => setTabHidden(document.visibilityState === 'hidden');
+    onVisibility();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
 
   // Reset stanu przy otwarciu.
   React.useEffect(() => {
@@ -349,7 +360,7 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
 
   // Autoplay + pasek postępu (jedna pętla rAF steruje obydwoma).
   React.useEffect(() => {
-    if (!open || paused || galleryTool || count <= 1 || phase !== 'shown') return undefined;
+    if (!open || paused || galleryTool || tabHidden || count <= 1 || phase !== 'shown') return undefined;
     const reduceMotion =
       typeof window !== 'undefined' && window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -357,7 +368,10 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
     let raf = 0;
     let last = performance.now();
     const tick = (now: number): void => {
-      const dt = now - last;
+      // Ograniczenie kroku: po dluzszej przerwie (karta w tle, uspiony system)
+      // pojedyncza klatka z ogromnym dt dopchnelaby pasek do konca i przeskoczyla
+      // slajd, zamiast wznowic od zamrozonego punktu.
+      const dt = Math.min(now - last, 100);
       last = now;
       if (busyRef.current) {
         // trwa przejście — wstrzymaj pasek przy końcu, nie skacz dalej
@@ -383,7 +397,7 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [open, paused, galleryTool, count, phase, commit]);
+  }, [open, paused, galleryTool, tabHidden, count, phase, commit]);
 
   // Klawiatura: strzałki + Escape.
   React.useEffect(() => {
