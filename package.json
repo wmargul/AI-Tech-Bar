@@ -10,11 +10,12 @@
     "start": "heft start --clean",
     "clean": "heft clean",
     "eject-webpack": "heft eject-webpack",
-    "voice:en": "node .voicegen/gen_all.js en",
-    "voice:pl": "node .voicegen/gen_all.js pl",
-    "voice:all": "node .voicegen/gen_all.js all",
+    "voice:en": "npm run voice:sync && node .voicegen/gen_all.js en",
+    "voice:pl": "npm run voice:sync && node .voicegen/gen_all.js pl",
+    "voice:all": "npm run voice:sync && node .voicegen/gen_all.js all",
     "video:goals": "node .voicegen/gen_goal_video.js",
-    "fix-voice": "node .voicegen/gen_all.js all && npm run build"
+    "fix-voice": "node .voicegen/gen_all.js all && npm run build",
+    "voice:sync": "heft build && node .voicegen/sync_lines.js"
   },
   "dependencies": {
     "@fluentui/react": "^8.106.4",

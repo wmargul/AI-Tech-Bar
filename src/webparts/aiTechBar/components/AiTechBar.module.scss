@@ -3680,6 +3680,40 @@
   color: rgba(238, 242, 255, 0.92);
 }
 
+// Kwestia z punktorem: myślnik w kolumnie obok treści, żeby zawijany tekst
+// trzymał wcięcie zamiast podchodzić pod znak.
+.peSpeechBullet {
+  display: flex;
+  gap: 12px;
+  margin: 0 0 10px;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.62;
+  color: rgba(238, 242, 255, 0.92);
+}
+
+.peBulletMark {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 2px;
+  margin-top: 0.82em;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--c-accent-from), var(--c-accent-to));
+}
+
+.peBlockBody {
+  min-width: 0;
+}
+
+// Wiersze wewnątrz jednej kwestii (etykieta nad opisem).
+.peSpeechRow {
+  display: block;
+}
+
+.peStrong {
+  font-weight: 700;
+  color: #fff;
+}
+
 .peCaret {
   display: inline-block;
   width: 9px;
@@ -3754,6 +3788,21 @@
 .peOption:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+// Pytanie, którego właśnie słuchamy. Zostaje na liście (nie znika), tylko
+// wyróżnia się jako aktywne — ponowne kliknięcie odtwarza kwestię od nowa.
+.peOption[data-active='true'] {
+  font-weight: 800;
+  color: #fff;
+  background: rgba(139, 156, 255, 0.16);
+  border-color: rgba(139, 156, 255, 0.62);
+  box-shadow: inset 2px 0 0 var(--c-accent-to);
+}
+
+.peOption[data-active='true'] .peOptionDot {
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.95);
+  transform: scale(1.25);
 }
 
 .peOptionDot {

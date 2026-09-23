@@ -6,7 +6,7 @@ import { useL10n } from '../i18n';
 import WarpField from './WarpField';
 import ConstellationBackground from '../background/ConstellationBackground';
 import PromptyAvatar, { AvatarMood } from './PromptyAvatar';
-import { PROMPTY_SCRIPT, IPromptyTopic } from '../data/promptyDialogue';
+import { PROMPTY_SCRIPT, IPromptyTopic, plainLine } from '../data/promptyDialogue';
 import { getVoiceClip } from '../data/voiceAssets';
 import { playClip, stopClip, IPlayHandle } from '../data/voicePlayer';
 
@@ -20,20 +20,46 @@ const WARP_IN_MS = 1500;
 const WARP_OUT_MS = 1500;
 const TYPE_SPEED_MS = 18;
 
-// Widoki rozmowy: powitanie (1. wejście), recap (po „Wróć do pytań"),
-// id tematu, lub pożegnanie.
-type View = 'greeting' | 'recap' | 'goodbye' | string;
+// Widoki rozmowy: powitanie (1. wejście), id tematu, lub pożegnanie.
+type View = 'greeting' | 'goodbye' | string;
 
 interface IOption {
   id: string;
   label: string;
-  action: 'topic' | 'recap' | 'exit';
+  action: 'topic' | 'exit';
   to?: string;
 }
 
 const prefersReducedMotion = (): boolean =>
   typeof window !== 'undefined' && !!window.matchMedia &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// --- Formatowanie kwestii ----------------------------------------------------
+// Zapis z promptyDialogue.ts („- " punktor, **pogrubienie**, \n złamanie) jest
+// rozbijany na segmenty. Maszyna do pisania odsłania ZNAKI TEKSTU, a nie
+// surową linię — inaczej w trakcie pisania mignęłyby same gwiazdki i myślniki.
+
+interface ISegment { text: string; bold: boolean; start: number }
+interface IBlock { bullet: boolean; rows: ISegment[][]; start: number; end: number }
+
+const buildBlocks = (lines: string[]): { blocks: IBlock[]; length: number } => {
+  let offset = 0;
+  const blocks = lines.map((line): IBlock => {
+    const bullet = line.indexOf('- ') === 0;
+    const start = offset;
+    const rows = (bullet ? line.slice(2) : line).split('\n').map((row) =>
+      row.split('**')
+        .map((part, i): ISegment => {
+          const seg = { text: part, bold: i % 2 === 1, start: offset };
+          offset += part.length;
+          return seg;
+        })
+        .filter((seg) => seg.text.length > 0)
+    );
+    return { bullet, rows, start, end: offset };
+  });
+  return { blocks, length: offset };
+};
 
 const PromptyExperience: React.FC<IPromptyExperienceProps> = ({ open, onClose, origin }) => {
   const { lang } = useL10n();
@@ -57,28 +83,25 @@ const PromptyExperience: React.FC<IPromptyExperienceProps> = ({ open, onClose, o
   // Kwestie aktualnego widoku.
   const lines: string[] =
     view === 'greeting' ? script.greetingLines :
-    view === 'recap' ? script.recapLines :
     view === 'goodbye' ? script.goodbyeLines :
     topic ? topic.lines : script.greetingLines;
 
-  // Opcje wyboru — budowane dynamicznie, więc w trakcie rozmowy zawsze widać
-  // pozostałe tematy (bez konieczności wracania do pełnego menu).
+  // Wszystkie pytania są widoczne przez cały czas — także to, które właśnie
+  // słuchamy (wyróżnione jako aktywne). Dzięki temu nie trzeba nigdzie wracać
+  // i nie ma osobnego kroku z pełnym menu.
   const options: IOption[] = React.useMemo(() => {
     if (view === 'goodbye') return [];
-    if (view === 'greeting' || view === 'recap') {
-      const opts: IOption[] = script.topics.map((tp) => ({ id: tp.id, label: tp.question, action: 'topic', to: tp.id }));
-      opts.push({ id: 'exit', label: script.exitLabel, action: 'exit' });
-      return opts;
-    }
-    const opts: IOption[] = script.topics
-      .filter((tp) => tp.id !== view)
-      .map((tp) => ({ id: tp.id, label: tp.question, action: 'topic', to: tp.id }));
-    opts.push({ id: 'back', label: script.backLabel, action: 'recap' });
+    const opts: IOption[] = script.topics.map((tp) => ({
+      id: tp.id, label: tp.question, action: 'topic', to: tp.id
+    }));
     opts.push({ id: 'exit', label: script.exitLabel, action: 'exit' });
     return opts;
   }, [view, script]);
 
-  const [revealed, setRevealed] = React.useState<string>('');
+  // Ile ZNAKÓW treści jest już odsłoniętych (bez znaczników formatowania).
+  const [revealed, setRevealed] = React.useState<number>(0);
+  // Ponowne kliknięcie aktywnego pytania odtwarza kwestię od nowa.
+  const [replay, setReplay] = React.useState<number>(0);
   const [done, setDone] = React.useState<boolean>(false);
   const [speaking, setSpeaking] = React.useState<boolean>(false);
   const [soundOn, setSoundOn] = React.useState<boolean>(true);
@@ -86,9 +109,15 @@ const PromptyExperience: React.FC<IPromptyExperienceProps> = ({ open, onClose, o
   const [greetingWave, setGreetingWave] = React.useState<boolean>(false);
   const [goodbyeSpoken, setGoodbyeSpoken] = React.useState<boolean>(false);
 
-  const fullText = lines.join('\n\n');
-  const fullRef = React.useRef<string>(fullText);
-  fullRef.current = fullText;
+  const { blocks, length: textLength } = React.useMemo(() => buildBlocks(lines), [lines]);
+  const lengthRef = React.useRef<number>(textLength);
+  lengthRef.current = textLength;
+
+  // Tekst dla lektora i fallbacku Web Speech — bez znaczników.
+  const spokenText = React.useMemo(() => lines.map(plainLine).join(' '), [lines]);
+  const spokenRef = React.useRef<string>(spokenText);
+  spokenRef.current = spokenText;
+
   const typeTimer = React.useRef<number>(0);
   const noticeTimer = React.useRef<number>(0);
   const voicesRef = React.useRef<SpeechSynthesisVoice[]>([]);
@@ -246,7 +275,8 @@ const PromptyExperience: React.FC<IPromptyExperienceProps> = ({ open, onClose, o
     if (!open) return;
     setPhase('in');
     setView('greeting');
-    setRevealed('');
+    setRevealed(0);
+    setReplay(0);
     setDone(false);
     setSpeaking(false);
     setSoundOn(true); // dźwięk domyślnie włączony
@@ -311,38 +341,38 @@ const PromptyExperience: React.FC<IPromptyExperienceProps> = ({ open, onClose, o
   // --- Typewriter (po pokazaniu panelu i przy każdej zmianie widoku) -----------
   React.useEffect(() => {
     if (phase !== 'shown') return undefined;
-    setRevealed('');
+    setRevealed(0);
     setDone(false);
-    const full = fullRef.current;
+    const total = lengthRef.current;
     let i = 0;
     window.clearInterval(typeTimer.current);
     typeTimer.current = window.setInterval(() => {
       i += 1;
-      setRevealed(full.slice(0, i));
-      if (i >= full.length) {
+      setRevealed(i);
+      if (i >= total) {
         window.clearInterval(typeTimer.current);
         setDone(true);
       }
     }, TYPE_SPEED_MS);
     return () => window.clearInterval(typeTimer.current);
-  }, [view, phase]);
+  }, [view, phase, replay]);
 
   // --- Mowa: wypowiedz kwestię widoku, gdy dźwięk włączony ---------------------
   React.useEffect(() => {
     if (phase !== 'shown' || !soundOn) return undefined;
     if (isGoodbye) {
       setGoodbyeSpoken(false);
-      say('goodbye', lines.join(' '), () => setGoodbyeSpoken(true));
+      say('goodbye', spokenRef.current, () => setGoodbyeSpoken(true));
     } else {
-      say(view, lines.join(' '));
+      say(view, spokenRef.current);
     }
     return () => cancelSpeech();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, phase, soundOn]);
+  }, [view, phase, soundOn, replay]);
 
   const skipTyping = React.useCallback((): void => {
     window.clearInterval(typeTimer.current);
-    setRevealed(fullRef.current);
+    setRevealed(lengthRef.current);
     setDone(true);
   }, []);
 
@@ -369,11 +399,14 @@ const PromptyExperience: React.FC<IPromptyExperienceProps> = ({ open, onClose, o
   // --- Wybór opcji dialogu ----------------------------------------------------
   const choose = React.useCallback((opt: IOption): void => {
     if (opt.action === 'exit') { setView('goodbye'); return; }
-    if (opt.action === 'recap') { setView('recap'); return; }
-    if (opt.to) setView(opt.to);
-  }, []);
+    if (!opt.to) return;
+    // Kliknięcie w aktywne pytanie nie zmienia widoku, więc samo setView nic by
+    // nie zrobiło — odtwarzamy kwestię jeszcze raz.
+    if (view === opt.to) { setReplay((n) => n + 1); return; }
+    setView(opt.to);
+  }, [view]);
 
-  // Wyjście przez X / Esc = identyczne jak „Zakończ rozmowę": PROMi najpierw się
+  // Wyjście przez X / Esc = identyczne jak „Wróć do Tech Baru": PROMi najpierw się
   // żegna (macha), a po dokończeniu kwestii doświadczenie samo się zwija.
   const requestExit = React.useCallback((): void => {
     if (closingRef.current) return;
@@ -407,7 +440,7 @@ const PromptyExperience: React.FC<IPromptyExperienceProps> = ({ open, onClose, o
     window.clearTimeout(noticeTimer.current);
     setShowNotice(false);
     setSoundOn(true);
-    speak(fullRef.current.replace(/\n+/g, ' ')); // gest użytkownika → odblokowuje mowę (Chrome)
+    speak(spokenRef.current); // gest użytkownika → odblokowuje mowę (Chrome)
   }, [speak]);
 
   const toggleSound = React.useCallback((): void => {
@@ -419,7 +452,7 @@ const PromptyExperience: React.FC<IPromptyExperienceProps> = ({ open, onClose, o
       window.clearTimeout(noticeTimer.current);
       setShowNotice(false);
       setSoundOn(true);
-      speak(fullRef.current.replace(/\n+/g, ' '));
+      speak(spokenRef.current);
     }
   }, [soundOn, cancelSpeech, speak, showSoundNotice]);
 
@@ -446,7 +479,8 @@ const PromptyExperience: React.FC<IPromptyExperienceProps> = ({ open, onClose, o
 
   if (!open || typeof document === 'undefined') return null;
 
-  const paragraphs = revealed.split('\n\n');
+  // Ostatni blok, w którym widać już jakiś tekst — tam stoi kursor.
+  const caretBlock = blocks.filter((b) => revealed > b.start).length - 1;
 
   const overlay = (
     <div
@@ -515,31 +549,58 @@ const PromptyExperience: React.FC<IPromptyExperienceProps> = ({ open, onClose, o
               <span className={styles.peSpeechRole}>{script.role}</span>
             </div>
             <div className={styles.peSpeechBody}>
-              {paragraphs.map((p, i) => (
-                <p key={i} className={styles.peSpeechText}>
-                  {p}
-                  {!done && i === paragraphs.length - 1 && <span className={styles.peCaret} />}
-                </p>
-              ))}
+              {blocks.map((block, bi) => {
+                if (revealed <= block.start) return null;
+                return (
+                  <div
+                    key={bi}
+                    className={block.bullet ? styles.peSpeechBullet : styles.peSpeechText}
+                  >
+                    {block.bullet && <span className={styles.peBulletMark} aria-hidden="true" />}
+                    <span className={styles.peBlockBody}>
+                      {block.rows.map((row, ri) => {
+                        const visible = row.filter((seg) => revealed > seg.start);
+                        if (visible.length === 0) return null;
+                        return (
+                          <span key={ri} className={styles.peSpeechRow}>
+                            {visible.map((seg, si) => {
+                              const txt = seg.text.slice(0, revealed - seg.start);
+                              return seg.bold
+                                ? <strong key={si} className={styles.peStrong}>{txt}</strong>
+                                : <React.Fragment key={si}>{txt}</React.Fragment>;
+                            })}
+                          </span>
+                        );
+                      })}
+                      {!done && bi === caretBlock && <span className={styles.peCaret} />}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
             {!done && <span className={styles.peSkipHint}>{script.skipHint}</span>}
           </div>
 
           <div className={styles.peOptions} data-ready={done ? 'true' : 'false'}>
             {options.length > 0 && <div className={styles.peChooseHint}>{script.chooseHint}</div>}
-            {options.map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                className={`${styles.peOption} ${opt.action === 'exit' ? styles.peOptionExit : ''}`}
-                onClick={() => choose(opt)}
-                disabled={!done}
-                tabIndex={done ? undefined : -1}
-              >
-                <span className={styles.peOptionDot} />
-                {opt.label}
-              </button>
-            ))}
+            {options.map((opt) => {
+              const active = opt.action === 'topic' && opt.to === view;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  className={`${styles.peOption} ${opt.action === 'exit' ? styles.peOptionExit : ''}`}
+                  data-active={active ? 'true' : 'false'}
+                  aria-current={active ? 'true' : undefined}
+                  onClick={() => choose(opt)}
+                  disabled={!done}
+                  tabIndex={done ? undefined : -1}
+                >
+                  <span className={styles.peOptionDot} />
+                  {opt.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 

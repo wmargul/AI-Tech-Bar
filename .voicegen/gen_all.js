@@ -6,13 +6,15 @@
 //   PL  = edge-tts, głos pl-PL-ZofiaNeural  (USŁUGA ONLINE — wymaga internetu)
 //   EN  = Piper, model en_US-amy-medium     (OFFLINE — działa bez sieci)
 //
-// Tekst pochodzi z .voicegen/voiceLines.json (lustro promptyDialogue.ts).
+// Tekst pochodzi z .voicegen/voiceLines.json (generowane przez sync_lines.js
+// z promptyDialogue.ts).
 // Format wyjściowy: AAC w MP4, 32 kHz, mono, ~48 kbps (jak istniejące klipy).
 //
 // Użycie:
-//   node .voicegen/gen_all.js all   # PL (online) + EN (offline)
-//   node .voicegen/gen_all.js en    # tylko EN (offline)
-//   node .voicegen/gen_all.js pl    # tylko PL (online)
+//   node .voicegen/gen_all.js all              # PL (online) + EN (offline)
+//   node .voicegen/gen_all.js en               # tylko EN (offline)
+//   node .voicegen/gen_all.js pl               # tylko PL (online)
+//   node .voicegen/gen_all.js all contains,best  # tylko wskazane kwestie
 // Zmienne: PROMI_PL_VOICE (domyślnie pl-PL-ZofiaNeural).
 // =============================================================================
 
@@ -39,10 +41,15 @@ const PL_VOICE = process.env.PROMI_PL_VOICE || 'pl-PL-ZofiaNeural';
 // PROMI_PL_ENGINE=piper -> generuj PL offline głosem gosia (bez sieci, awaryjnie).
 const PL_ENGINE = (process.env.PROMI_PL_ENGINE || 'edge').toLowerCase();
 
-const VIEWS = ['greeting', 'recap', 'goodbye', 'what', 'contains', 'start3', 'best', 'responsible'];
+// Lista kwestii wprost z lustra — dopisanie tematu nie wymaga ruszania tego pliku.
+const VIEWS = Object.keys(LINES.pl || {});
 
 function spoken(lines, lang) {
-  let t = lines.join(' ');
+  // Znaczniki formatowania są dla ekranu, nie dla lektora (patrz plainLine()
+  // w promptyDialogue.ts — obie funkcje muszą dawać ten sam wynik).
+  let t = lines
+    .map((l) => l.replace(/^- /, '').replace(/\*\*/g, '').replace(/\n/g, ' '))
+    .join(' ');
   t = t.replace(/[\u2014\u2013]/g, ', '); // myślniki -> przecinek (pauza)
   if (lang === 'pl') {
     t = t.replace(/PROMi/g, 'Promi'); // czytaj jak imię, nie literuj
@@ -121,12 +128,19 @@ function updateVoiceData(updates) {
 function main() {
   const arg = (process.argv[2] || 'all').toLowerCase();
   const langs = arg === 'pl' ? ['pl'] : arg === 'en' ? ['en'] : ['pl', 'en'];
+  // Opcjonalne zawężenie do wybranych kwestii — przy poprawce jednego tekstu
+  // nie ma powodu przegenerowywać (i zmieniać w gicie) wszystkich klipów.
+  const only = (process.argv[3] || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const views = only.length ? VIEWS.filter((v) => only.indexOf(v) >= 0) : VIEWS;
+  if (only.length && views.length !== only.length) {
+    throw new Error(`Nieznane kwestie: ${only.filter((v) => VIEWS.indexOf(v) < 0).join(', ')}`);
+  }
   fs.mkdirSync(TMP, { recursive: true });
   const updates = {};
   for (const lang of langs) {
     const plLabel = PL_ENGINE === 'piper' ? 'pl_PL-gosia / Piper offline' : PL_VOICE + ' / edge-tts online';
     console.log(`\n=== ${lang.toUpperCase()} (${lang === 'pl' ? plLabel : 'en_US-amy / Piper offline'}) ===`);
-    for (const view of VIEWS) {
+    for (const view of views) {
       const lines = LINES[lang] && LINES[lang][view];
       if (!lines) { console.warn(`  POMIJAM ${lang}_${view} (brak w voiceLines.json)`); continue; }
       const text = spoken(lines, lang);
