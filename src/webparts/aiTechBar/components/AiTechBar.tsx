@@ -339,7 +339,7 @@ const AiTechBar: React.FC<IAiTechBarProps> = (props) => {
           <NavigationHero firstName={firstName} onNavigate={scrollToSection} />
           <PolicySection settings={settings} />
           <StrefaSzkolen settings={settings} />
-          <CelSection onSelectGoal={scrollToSection} />
+          <CelSection onSelectGoal={scrollToSection} settings={settings} />
           <ToolsCarousel settings={settings} />
           <BookingSection
             settings={settings}

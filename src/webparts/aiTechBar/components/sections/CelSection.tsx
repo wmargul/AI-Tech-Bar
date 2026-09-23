@@ -1,17 +1,30 @@
 import * as React from 'react';
 import styles from '../AiTechBar.module.scss';
-import { GOALS } from '../data/config';
+import { GOALS, IGoal, IResolvedSettings } from '../data/config';
 import { useL10n } from '../i18n';
 import GoalVideo from './GoalVideo';
 import GoalGlyph from './GoalGlyph';
+import GoalGuide from './GoalGuide';
 
 export interface ICelSectionProps {
   onSelectGoal: (targetId: string) => void;
+  settings: IResolvedSettings;
 }
 
 
-const CelSection: React.FC<ICelSectionProps> = ({ onSelectGoal }) => {
+const CelSection: React.FC<ICelSectionProps> = ({ onSelectGoal, settings }) => {
   const { t } = useL10n();
+
+  // Przewodnik celu — pełnoekranowa nakładka otwierana z „Dopasuj narzędzie".
+  // `onSelectGoal` zostaje: przewinięcie do sekcji Narzędzia AI jest teraz
+  // linkiem wewnątrz przewodnika, a nie efektem kliknięcia kafelka.
+  const [guideGoal, setGuideGoal] = React.useState<IGoal | undefined>(undefined);
+  const [guideOrigin, setGuideOrigin] = React.useState<{ x: number; y: number } | undefined>(undefined);
+
+  const openGuide = (goal: IGoal, e: React.MouseEvent): void => {
+    setGuideOrigin({ x: e.clientX, y: e.clientY });
+    setGuideGoal(goal);
+  };
 
   // `active` = aktualnie powiększony kafelek (hover). `shown` = co jest zamontowane w nakładce
   // (trzymane też podczas animacji zwijania, by kafelek mógł płynnie wrócić na swoje miejsce).
@@ -230,7 +243,7 @@ const CelSection: React.FC<ICelSectionProps> = ({ onSelectGoal }) => {
                   className={styles.goalCard}
                   onMouseEnter={() => openFrom(i)}
                   onFocus={() => openFrom(i)}
-                  onClick={() => onSelectGoal('sec-tools')}
+                  onClick={(e) => openGuide(goal, e)}
                 >
                   <span className={styles.goalGlow} style={{ background: goal.accent }} aria-hidden="true" />
                   <span className={styles.goalIconBare} aria-hidden="true"><GoalGlyph id={goal.id} className={styles.goalGlyphSvg} /></span>
@@ -253,7 +266,7 @@ const CelSection: React.FC<ICelSectionProps> = ({ onSelectGoal }) => {
               type="button"
               className={styles.goalExpandCard}
               data-closing={closing ? 'true' : 'false'}
-              onClick={() => onSelectGoal('sec-tools')}
+              onClick={(e) => openGuide(shownGoal, e)}
             >
               <span className={styles.goalExpandGlow} style={{ background: shownGoal.accent }} aria-hidden="true" />
               <span className={styles.goalExpandArt}>
@@ -297,6 +310,17 @@ const CelSection: React.FC<ICelSectionProps> = ({ onSelectGoal }) => {
           )}
         </div>
       </div>
+
+      {guideGoal && (
+        <GoalGuide
+          open
+          goal={guideGoal}
+          settings={settings}
+          origin={guideOrigin}
+          onClose={() => setGuideGoal(undefined)}
+          onAllTools={() => { setGuideGoal(undefined); onSelectGoal('sec-tools'); }}
+        />
+      )}
     </section>
   );
 };

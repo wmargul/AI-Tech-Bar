@@ -93,6 +93,16 @@ export interface IStrings {
   };
   /** Tytuly placeholderow galerii; {tool} podmieniane na nazwe narzedzia. */
   trainingPlaceholders: string[];
+  /** Etykiety okna przewodnika celu; tresc merytoryczna w data/goalGuides.ts. */
+  goalGuide: {
+    eyebrow: string; close: string; pickTool: string;
+    step1: string; step2: string; step3: string;
+    faqTitle: string; requestTitle: string; requestLead: string;
+    watchCta: string; moreTraining: string; soon: string; videoPending: string;
+    minutes: string; level: string;
+    audience: string; fillTime: string; about: string;
+    requestCta: string; allToolsCta: string;
+  };
   policyRules: { title: string; text: string }[];
 }
 
@@ -349,6 +359,28 @@ const PL: IStrings = {
     'Zaawansowane scenariusze',
     'Najczęstsze błędy i jak ich uniknąć'
   ],
+  goalGuide: {
+    eyebrow: 'Przewodnik',
+    close: 'Zamknij',
+    pickTool: 'Wybierz narzędzie',
+    step1: 'Krok 1 · Zacznij od szkolenia',
+    step2: 'Krok 2 · Najczęstsze pytania',
+    step3: 'Krok 3 · Złóż wniosek',
+    faqTitle: 'Zanim zaczniesz',
+    requestTitle: 'Złóż wniosek o dostęp',
+    requestLead: 'Dostęp przyznajemy po zaakceptowaniu wniosku. Formularz jest krótki — wypełnisz go w kilka minut.',
+    watchCta: 'Oglądaj szkolenie',
+    moreTraining: 'Więcej szkoleń',
+    soon: 'Wkrótce',
+    videoPending: 'Nagranie jest w przygotowaniu. Zanim się pojawi, zajrzyj do pozostałych materiałów szkoleniowych.',
+    minutes: 'minut',
+    level: 'Poziom',
+    audience: 'Dostępne dla',
+    fillTime: 'Czas wypełnienia',
+    about: 'ok.',
+    requestCta: 'Wniosek o dostęp do {tool}',
+    allToolsCta: 'Zobacz wszystkie narzędzia'
+  },
   policyRules: [
     {
       title: 'Decyzja należy do Ciebie',
@@ -622,6 +654,28 @@ const EN: IStrings = {
     'Advanced scenarios',
     'Common mistakes and how to avoid them'
   ],
+  goalGuide: {
+    eyebrow: 'Guide',
+    close: 'Close',
+    pickTool: 'Pick a tool',
+    step1: 'Step 1 · Start with the training',
+    step2: 'Step 2 · Frequently asked questions',
+    step3: 'Step 3 · Request access',
+    faqTitle: 'Before you start',
+    requestTitle: 'Request access',
+    requestLead: 'Access is granted once your request is approved. The form is short — a few minutes at most.',
+    watchCta: 'Watch the training',
+    moreTraining: 'More training',
+    soon: 'Coming soon',
+    videoPending: 'This recording is in production. Until it lands, take a look at the other training materials.',
+    minutes: 'minutes',
+    level: 'Level',
+    audience: 'Available to',
+    fillTime: 'Time to complete',
+    about: 'approx.',
+    requestCta: 'Request access to {tool}',
+    allToolsCta: 'See all tools'
+  },
   policyRules: [
     {
       title: 'The decision is yours',

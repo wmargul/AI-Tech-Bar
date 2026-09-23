@@ -4793,6 +4793,9 @@
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
+
+  img { width: 34px; height: 34px; object-fit: contain; display: block; }
+  .toolLogoFallback { font-size: 20px; }
 }
 
 .tgHeadText { flex: 1 1 auto; min-width: 0; }
@@ -5044,4 +5047,688 @@
   .tgCard:hover:not(:disabled) { transform: none; }
   .tgCard:hover:not(:disabled) .tgPlay { transform: none; }
   .tgClose:hover { transform: none; }
+}
+
+// =============================================================================
+// Przewodnik celu — nakładka spod „Dopasuj narzędzie" w sekcji Cel.
+// z-index PONIŻEJ .tgOverlay (999998), bo galeria szkoleń otwiera się z jego
+// wnętrza i musi lec na wierzchu.
+// =============================================================================
+.ggOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999994;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 24px;
+}
+
+.ggScrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(6, 9, 24, 0.8);
+  backdrop-filter: blur(18px);
+}
+
+.ggPanel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1040px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 28px;
+  background: linear-gradient(165deg, rgba(24, 28, 56, 0.96), rgba(12, 15, 34, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+}
+
+// --- nagłówek celu ------------------------------------------------------------
+
+.ggHead {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 34px 36px 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+// Gradient celu jako poświata, a nie tło — inaczej zabiłby czytelność tekstu.
+.ggHeadGlow {
+  position: absolute;
+  top: -55%;
+  left: -10%;
+  width: 70%;
+  height: 210%;
+  opacity: 0.22;
+  filter: blur(70px);
+  pointer-events: none;
+}
+
+.ggHeadIcon {
+  position: relative;
+  flex: 0 0 auto;
+  width: 62px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.ggGlyph {
+  width: 30px;
+  height: 30px;
+  color: var(--c-text);
+}
+
+.ggHeadText {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ggEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+
+.ggEyebrowLine {
+  width: 26px;
+  height: 1px;
+  background: linear-gradient(90deg, #b39bff, #6ee7ff);
+}
+
+.ggTitle {
+  margin: 10px 0 8px;
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--c-text);
+}
+
+.ggLead {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--c-text-dim);
+}
+
+.ggChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.ggChip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.ggClose {
+  position: relative;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.ggClose:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
+}
+
+// --- przełącznik narzędzi (tylko cele z 2+ narzędziami) -----------------------
+
+.ggTabs {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 36px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ggTabsHint {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+
+.ggTabsRow {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.ggTab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px 11px;
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--c-text-dim);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.ggTab:hover {
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ggTab[data-active='true'] {
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.ggTabLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+
+  img { width: 20px; height: 20px; object-fit: contain; display: block; }
+  .toolLogoFallback { font-size: 12px; }
+}
+
+// Podkreślenie w gradiencie celu — widoczne tylko na aktywnej zakładce.
+.ggTabInk {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  opacity: 0;
+  transform: scaleX(0.4);
+  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ggTab[data-active='true'] .ggTabInk {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+// --- treść kroków --------------------------------------------------------------
+
+.ggBody {
+  padding: 30px 36px 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.ggStep { min-width: 0; }
+
+.ggStepLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+
+.ggStepDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.ggStepTitle {
+  margin: 12px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--c-text);
+}
+
+.ggStepLead {
+  margin: 8px 0 0;
+  max-width: 68ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--c-text-dim);
+}
+
+// --- krok 1: szkolenie ---------------------------------------------------------
+
+.ggVideoCard {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 24px;
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+}
+
+.ggVideoFrame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.ggVideo {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.ggVideoPending {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ggVideoVeil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(8, 11, 28, 0.55), rgba(8, 11, 28, 0.8));
+}
+
+.ggPlay {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+}
+
+.ggSoon {
+  position: relative;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.ggVideoInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ggVideoTitle {
+  margin: 2px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+.ggVideoMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--c-text-faint);
+}
+
+.ggMetaDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.ggVideoDesc {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--c-text-dim);
+}
+
+.ggPendingNote {
+  margin: 12px 0 0;
+  padding: 10px 13px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--c-text-dim);
+  background: rgba(110, 231, 255, 0.07);
+  border: 1px solid rgba(110, 231, 255, 0.2);
+}
+
+.ggVideoActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.ggPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0c1330;
+  background: linear-gradient(90deg, #b39bff, #6ee7ff);
+  border: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.ggPrimary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.32);
+}
+
+.ggPrimary:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.ggGhost {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.ggGhost:hover {
+  color: var(--c-text);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+// --- krok 2: FAQ ---------------------------------------------------------------
+
+.ggFaq {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.ggFaqItem {
+  border-radius: 14px;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.ggFaqItem[data-open='true'] {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(179, 155, 255, 0.34);
+}
+
+.ggFaqQ {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 18px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--c-text);
+  background: transparent;
+  border: 0;
+}
+
+.ggFaqChevron {
+  flex: 0 0 auto;
+  display: flex;
+  color: var(--c-text-faint);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s ease;
+}
+
+.ggFaqItem[data-open='true'] .ggFaqChevron {
+  transform: rotate(180deg);
+  color: #b39bff;
+}
+
+// Rozwijanie przez grid-template-rows: animuje się płynnie bez znajomości
+// docelowej wysokości, więc nie trzeba mierzyć treści w JS.
+.ggFaqAWrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ggFaqItem[data-open='true'] .ggFaqAWrap {
+  grid-template-rows: 1fr;
+}
+
+.ggFaqAInner { overflow: hidden; }
+
+.ggFaqA {
+  margin: 0;
+  padding: 0 18px 16px;
+  max-width: 78ch;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--c-text-dim);
+}
+
+// --- krok 3: wniosek -----------------------------------------------------------
+
+.ggRequest {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+  background: var(--c-card);
+  border: 1px solid var(--c-card-border);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ggRequest:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.36);
+}
+
+.ggRequest:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.ggRequestGlow {
+  position: absolute;
+  top: -80%;
+  left: -6%;
+  width: 46%;
+  height: 260%;
+  opacity: 0.16;
+  filter: blur(54px);
+  pointer-events: none;
+}
+
+.ggRequestLogo {
+  position: relative;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  img { width: 26px; height: 26px; object-fit: contain; display: block; }
+  .toolLogoFallback { font-size: 15px; }
+}
+
+.ggRequestText {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ggRequestTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+.ggRequestSub {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--c-text-faint);
+}
+
+.ggRequestArrow {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  color: var(--c-text-dim);
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.ggRequest:hover:not(:disabled) .ggRequestArrow {
+  transform: translateX(4px);
+  color: #6ee7ff;
+}
+
+.ggRequestMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  font-size: 12.5px;
+  color: var(--c-text-faint);
+}
+
+.ggRequestMeta strong {
+  font-weight: 600;
+  color: var(--c-text-dim);
+}
+
+.ggAllTools {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 0;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--c-text-dim);
+  background: transparent;
+  border: 0;
+  transition: color 0.2s ease;
+}
+
+.ggAllTools:hover { color: #6ee7ff; }
+.ggAllTools svg { transition: transform 0.2s ease; }
+.ggAllTools:hover svg { transform: translateX(4px); }
+
+// --- warianty wąskie ------------------------------------------------------------
+
+@media (max-width: 900px) {
+  .ggVideoCard { grid-template-columns: minmax(0, 1fr); }
+  .ggHead { padding: 26px 22px 24px; }
+  .ggTabs {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 22px;
+  }
+  .ggBody { padding: 24px 22px 28px; gap: 28px; }
+}
+
+@media (max-width: 620px) {
+  .ggOverlay { padding: 16px 10px; }
+  .ggHead { flex-wrap: wrap; }
+  .ggClose { order: -1; margin-left: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ggRequest:hover:not(:disabled),
+  .ggPrimary:hover:not(:disabled) { transform: none; }
+  .ggClose:hover { transform: none; }
+  .ggFaqAWrap { transition: none; }
+  .ggTabInk { transition: none; }
 }
