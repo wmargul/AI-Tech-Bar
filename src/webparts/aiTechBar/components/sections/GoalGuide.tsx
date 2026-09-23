@@ -8,6 +8,7 @@ import { useL10n } from '../i18n';
 import GoalGlyph from './GoalGlyph';
 import ToolLogo from './ToolLogo';
 import TrainingGallery from './TrainingGallery';
+import ScrollBar from '../ScrollBar';
 
 export interface IGoalGuideProps {
   open: boolean;
@@ -55,6 +56,7 @@ const GoalGuide: React.FC<IGoalGuideProps> = ({ open, onClose, goal, settings, o
 
   const rootRef = React.useRef<HTMLDivElement>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
   const bodyRef = React.useRef<HTMLDivElement>(null);
   const closingRef = React.useRef<boolean>(false);
 
@@ -193,178 +195,182 @@ const GoalGuide: React.FC<IGoalGuideProps> = ({ open, onClose, goal, settings, o
       <button type="button" className={styles.ggScrim} onClick={requestClose} aria-label={s.close} />
 
       <div ref={panelRef} className={styles.ggPanel}>
-        <div className={styles.ggHead}>
-          <span className={styles.ggHeadGlow} style={{ background: goal.accent }} aria-hidden="true" />
-          <span className={styles.ggHeadIcon} aria-hidden="true">
-            <GoalGlyph id={goal.id} className={styles.ggGlyph} />
-          </span>
-          <div className={styles.ggHeadText}>
-            <div className={styles.ggEyebrow}>
-              <span className={styles.ggEyebrowLine} />
-              {s.eyebrow} · {guide.category}
+        <div ref={scrollRef} className={styles.sbScroll}>
+          <div className={styles.ggHead}>
+            <span className={styles.ggHeadGlow} style={{ background: goal.accent }} aria-hidden="true" />
+            <span className={styles.ggHeadIcon} aria-hidden="true">
+              <GoalGlyph id={goal.id} className={styles.ggGlyph} />
+            </span>
+            <div className={styles.ggHeadText}>
+              <div className={styles.ggEyebrow}>
+                <span className={styles.ggEyebrowLine} />
+                {s.eyebrow} · {guide.category}
+              </div>
+              <h2 className={styles.ggTitle}>{goalTitle}</h2>
+              <p className={styles.ggLead}>{guide.lead}</p>
+              <div className={styles.ggChips}>
+                {tools.map((x) => {
+                  const xt = t.toolText[x.id];
+                  return (
+                    <span key={x.id} className={styles.ggChip}>
+                      {(xt && xt.name) || x.name}
+                    </span>
+                  );
+                })}
+                <span className={styles.ggChip}>{guide.audience}</span>
+              </div>
             </div>
-            <h2 className={styles.ggTitle}>{goalTitle}</h2>
-            <p className={styles.ggLead}>{guide.lead}</p>
-            <div className={styles.ggChips}>
-              {tools.map((x) => {
-                const xt = t.toolText[x.id];
-                return (
-                  <span key={x.id} className={styles.ggChip}>
-                    {(xt && xt.name) || x.name}
-                  </span>
-                );
-              })}
-              <span className={styles.ggChip}>{guide.audience}</span>
-            </div>
+            <button type="button" className={styles.ggClose} onClick={requestClose} aria-label={s.close}>×</button>
           </div>
-          <button type="button" className={styles.ggClose} onClick={requestClose} aria-label={s.close}>×</button>
-        </div>
 
-        {multi && (
-          <div className={styles.ggTabs} role="tablist" aria-label={s.pickTool}>
-            <span className={styles.ggTabsHint}>{s.pickTool}</span>
-            <div className={styles.ggTabsRow}>
-              {tools.map((x, i) => {
-                const xt = t.toolText[x.id];
-                const on = i === index;
-                return (
-                  <button
-                    key={x.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={on}
-                    className={styles.ggTab}
-                    data-active={on ? 'true' : 'false'}
-                    onClick={() => { setTab(i); setOpenFaq(0); }}
-                  >
-                    <span className={styles.ggTabLogo}><ToolLogo id={x.id} badge={x.badge} /></span>
-                    {(xt && xt.name) || x.name}
-                    <span className={styles.ggTabInk} style={{ background: goal.accent }} aria-hidden="true" />
-                  </button>
-                );
-              })}
+          {multi && (
+            <div className={styles.ggTabs} role="tablist" aria-label={s.pickTool}>
+              <span className={styles.ggTabsHint}>{s.pickTool}</span>
+              <div className={styles.ggTabsRow}>
+                {tools.map((x, i) => {
+                  const xt = t.toolText[x.id];
+                  const on = i === index;
+                  return (
+                    <button
+                      key={x.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={on}
+                      className={styles.ggTab}
+                      data-active={on ? 'true' : 'false'}
+                      onClick={() => { setTab(i); setOpenFaq(0); }}
+                    >
+                      <span className={styles.ggTabLogo}><ToolLogo id={x.id} badge={x.badge} /></span>
+                      {(xt && xt.name) || x.name}
+                      <span className={styles.ggTabInk} style={{ background: goal.accent }} aria-hidden="true" />
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div ref={bodyRef} className={styles.ggBody}>
-          {/* --- Krok 1: szkolenie --- */}
-          <section className={styles.ggStep}>
-            <div className={styles.ggStepLabel}>
-              <span className={styles.ggStepDot} style={{ background: goal.accent }} aria-hidden="true" />
-              {s.step1}
-            </div>
+          <div ref={bodyRef} className={styles.ggBody}>
+            {/* --- Krok 1: szkolenie --- */}
+            <section className={styles.ggStep}>
+              <div className={styles.ggStepLabel}>
+                <span className={styles.ggStepDot} style={{ background: goal.accent }} aria-hidden="true" />
+                {s.step1}
+              </div>
 
-            <div className={styles.ggVideoCard}>
-              <div className={styles.ggVideoFrame}>
-                {videoReady ? (
-                  <video className={styles.ggVideo} src={setup.videoUrl} controls preload="metadata" />
-                ) : (
-                  <div className={styles.ggVideoPending} style={{ background: goal.accent }}>
-                    <span className={styles.ggVideoVeil} aria-hidden="true" />
-                    <span className={styles.ggPlay}><PlayIcon /></span>
-                    <span className={styles.ggSoon}>{s.soon}</span>
+              <div className={styles.ggVideoCard}>
+                <div className={styles.ggVideoFrame}>
+                  {videoReady ? (
+                    <video className={styles.ggVideo} src={setup.videoUrl} controls preload="metadata" />
+                  ) : (
+                    <div className={styles.ggVideoPending} style={{ background: goal.accent }}>
+                      <span className={styles.ggVideoVeil} aria-hidden="true" />
+                      <span className={styles.ggPlay}><PlayIcon /></span>
+                      <span className={styles.ggSoon}>{s.soon}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.ggVideoInfo}>
+                  <h3 className={styles.ggVideoTitle}>{tx.videoTitle}</h3>
+                  <div className={styles.ggVideoMeta}>
+                    <span>{setup.videoMin} {s.minutes}</span>
+                    <span className={styles.ggMetaDot} aria-hidden="true" />
+                    <span>{s.level}: {tx.videoLevel}</span>
                   </div>
-                )}
-              </div>
+                  <p className={styles.ggVideoDesc}>{tx.videoDesc}</p>
+                  {!videoReady && <p className={styles.ggPendingNote}>{s.videoPending}</p>}
 
-              <div className={styles.ggVideoInfo}>
-                <h3 className={styles.ggVideoTitle}>{tx.videoTitle}</h3>
-                <div className={styles.ggVideoMeta}>
-                  <span>{setup.videoMin} {s.minutes}</span>
-                  <span className={styles.ggMetaDot} aria-hidden="true" />
-                  <span>{s.level}: {tx.videoLevel}</span>
-                </div>
-                <p className={styles.ggVideoDesc}>{tx.videoDesc}</p>
-                {!videoReady && <p className={styles.ggPendingNote}>{s.videoPending}</p>}
-
-                <div className={styles.ggVideoActions}>
-                  <button
-                    type="button"
-                    className={styles.ggPrimary}
-                    onClick={() => openLink(setup.videoUrl)}
-                    disabled={!videoReady}
-                  >
-                    {s.watchCta}
-                    <ArrowIcon />
-                  </button>
-                  <button type="button" className={styles.ggGhost} onClick={showGallery}>
-                    {s.moreTraining}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* --- Krok 2: FAQ --- */}
-          <section className={styles.ggStep}>
-            <div className={styles.ggStepLabel}>
-              <span className={styles.ggStepDot} style={{ background: goal.accent }} aria-hidden="true" />
-              {s.step2}
-            </div>
-            <h3 className={styles.ggStepTitle}>{s.faqTitle}</h3>
-
-            <div className={styles.ggFaq}>
-              {tx.faq.map((item, i) => {
-                const on = openFaq === i;
-                return (
-                  <div key={item.q} className={styles.ggFaqItem} data-open={on ? 'true' : 'false'}>
+                  <div className={styles.ggVideoActions}>
                     <button
                       type="button"
-                      className={styles.ggFaqQ}
-                      aria-expanded={on}
-                      onClick={() => setOpenFaq(on ? null : i)}
+                      className={styles.ggPrimary}
+                      onClick={() => openLink(setup.videoUrl)}
+                      disabled={!videoReady}
                     >
-                      <span>{item.q}</span>
-                      <span className={styles.ggFaqChevron}><ChevronIcon /></span>
+                      {s.watchCta}
+                      <ArrowIcon />
                     </button>
-                    <div className={styles.ggFaqAWrap}>
-                      <div className={styles.ggFaqAInner}>
-                        <p className={styles.ggFaqA}>{item.a}</p>
+                    <button type="button" className={styles.ggGhost} onClick={showGallery}>
+                      {s.moreTraining}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* --- Krok 2: FAQ --- */}
+            <section className={styles.ggStep}>
+              <div className={styles.ggStepLabel}>
+                <span className={styles.ggStepDot} style={{ background: goal.accent }} aria-hidden="true" />
+                {s.step2}
+              </div>
+              <h3 className={styles.ggStepTitle}>{s.faqTitle}</h3>
+
+              <div className={styles.ggFaq}>
+                {tx.faq.map((item, i) => {
+                  const on = openFaq === i;
+                  return (
+                    <div key={item.q} className={styles.ggFaqItem} data-open={on ? 'true' : 'false'}>
+                      <button
+                        type="button"
+                        className={styles.ggFaqQ}
+                        aria-expanded={on}
+                        onClick={() => setOpenFaq(on ? null : i)}
+                      >
+                        <span>{item.q}</span>
+                        <span className={styles.ggFaqChevron}><ChevronIcon /></span>
+                      </button>
+                      <div className={styles.ggFaqAWrap}>
+                        <div className={styles.ggFaqAInner}>
+                          <p className={styles.ggFaqA}>{item.a}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+                  );
+                })}
+              </div>
+            </section>
 
-          {/* --- Krok 3: wniosek --- */}
-          <section className={styles.ggStep}>
-            <div className={styles.ggStepLabel}>
-              <span className={styles.ggStepDot} style={{ background: goal.accent }} aria-hidden="true" />
-              {s.step3}
-            </div>
-            <h3 className={styles.ggStepTitle}>{s.requestTitle}</h3>
-            <p className={styles.ggStepLead}>{s.requestLead}</p>
+            {/* --- Krok 3: wniosek --- */}
+            <section className={styles.ggStep}>
+              <div className={styles.ggStepLabel}>
+                <span className={styles.ggStepDot} style={{ background: goal.accent }} aria-hidden="true" />
+                {s.step3}
+              </div>
+              <h3 className={styles.ggStepTitle}>{s.requestTitle}</h3>
+              <p className={styles.ggStepLead}>{s.requestLead}</p>
 
-            <button
-              type="button"
-              className={styles.ggRequest}
-              onClick={() => openLink(requestUrl)}
-              disabled={!isReady(requestUrl)}
-            >
-              <span className={styles.ggRequestGlow} style={{ background: tool.accent }} aria-hidden="true" />
-              <span className={styles.ggRequestLogo}><ToolLogo id={tool.id} badge={tool.badge} /></span>
-              <span className={styles.ggRequestText}>
-                <span className={styles.ggRequestTitle}>{s.requestCta.replace('{tool}', toolName)}</span>
-                <span className={styles.ggRequestSub}>{tx.surfaces.join(' · ')}</span>
-              </span>
-              <span className={styles.ggRequestArrow}><ArrowIcon /></span>
-            </button>
+              <button
+                type="button"
+                className={styles.ggRequest}
+                onClick={() => openLink(requestUrl)}
+                disabled={!isReady(requestUrl)}
+              >
+                <span className={styles.ggRequestGlow} style={{ background: tool.accent }} aria-hidden="true" />
+                <span className={styles.ggRequestLogo}><ToolLogo id={tool.id} badge={tool.badge} /></span>
+                <span className={styles.ggRequestText}>
+                  <span className={styles.ggRequestTitle}>{s.requestCta.replace('{tool}', toolName)}</span>
+                  <span className={styles.ggRequestSub}>{tx.surfaces.join(' · ')}</span>
+                </span>
+                <span className={styles.ggRequestArrow}><ArrowIcon /></span>
+              </button>
 
-            <div className={styles.ggRequestMeta}>
-              <span>{s.audience}: <strong>{guide.audience}</strong></span>
-              <span className={styles.ggMetaDot} aria-hidden="true" />
-              <span>{s.fillTime}: <strong>{s.about} {setup.requestMin} min</strong></span>
-            </div>
+              <div className={styles.ggRequestMeta}>
+                <span>{s.audience}: <strong>{guide.audience}</strong></span>
+                <span className={styles.ggMetaDot} aria-hidden="true" />
+                <span>{s.fillTime}: <strong>{s.about} {setup.requestMin} min</strong></span>
+              </div>
 
-            <button type="button" className={styles.ggAllTools} onClick={onAllTools}>
-              {s.allToolsCta}
-              <ArrowIcon />
-            </button>
-          </section>
+              <button type="button" className={styles.ggAllTools} onClick={onAllTools}>
+                {s.allToolsCta}
+                <ArrowIcon />
+              </button>
+            </section>
+          </div>
         </div>
+
+        <ScrollBar targetRef={scrollRef} />
       </div>
 
       {galleryTool && (

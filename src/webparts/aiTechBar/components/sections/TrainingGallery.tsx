@@ -5,6 +5,7 @@ import styles from '../AiTechBar.module.scss';
 import { ITool, ITrainingVideo, IResolvedSettings, trainingVideosFor } from '../data/config';
 import { useL10n } from '../i18n';
 import ToolLogo from './ToolLogo';
+import ScrollBar from '../ScrollBar';
 
 export interface ITrainingGalleryProps {
   open: boolean;
@@ -44,6 +45,7 @@ const TrainingGallery: React.FC<ITrainingGalleryProps> = ({
 
   const rootRef = React.useRef<HTMLDivElement>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
   const gridRef = React.useRef<HTMLDivElement>(null);
   const closingRef = React.useRef<boolean>(false);
 
@@ -139,65 +141,68 @@ const TrainingGallery: React.FC<ITrainingGalleryProps> = ({
 
       <div ref={panelRef} className={styles.tgPanel}>
         <span className={styles.tgAccent} style={{ background: tool.accent }} aria-hidden="true" />
-
-        <div className={styles.tgHead}>
-          <div className={styles.tgHeadLogo}>
-            <ToolLogo id={tool.id} badge={tool.badge} />
-          </div>
-          <div className={styles.tgHeadText}>
-            <div className={styles.tgEyebrow}>
-              <span className={styles.tgEyebrowLine} />
-              {s.eyebrow} · {tool.tagline}
+        <div ref={scrollRef} className={`${styles.sbScroll} ${styles.tgScroll}`}>
+          <div className={styles.tgHead}>
+            <div className={styles.tgHeadLogo}>
+              <ToolLogo id={tool.id} badge={tool.badge} />
             </div>
-            <h2 className={styles.tgTitle}>{tool.name}</h2>
-            <p className={styles.tgLead}>{s.lead}</p>
+            <div className={styles.tgHeadText}>
+              <div className={styles.tgEyebrow}>
+                <span className={styles.tgEyebrowLine} />
+                {s.eyebrow} · {tool.tagline}
+              </div>
+              <h2 className={styles.tgTitle}>{tool.name}</h2>
+              <p className={styles.tgLead}>{s.lead}</p>
+            </div>
+            <button type="button" className={styles.tgClose} onClick={requestClose} aria-label={s.close}>×</button>
           </div>
-          <button type="button" className={styles.tgClose} onClick={requestClose} aria-label={s.close}>×</button>
-        </div>
 
-        {pending && <p className={styles.tgNote}>{s.note}</p>}
+          {pending && <p className={styles.tgNote}>{s.note}</p>}
 
-        <div ref={gridRef} className={styles.tgGrid}>
-          {videos.map((video, i) => {
-            const ready = !!video.url && video.url !== '#';
-            return (
-              <button
-                key={video.id}
-                type="button"
-                className={`${styles.tgCard} ${ready ? '' : styles.tgCardPending}`}
-                onClick={() => openLink(video.url)}
-                disabled={!ready}
-              >
-                <span className={styles.tgThumb} style={{ background: tool.accent }}>
-                  <span className={styles.tgThumbVeil} aria-hidden="true" />
-                  <span className={styles.tgPlay}><PlayIcon /></span>
-                  <span className={styles.tgDuration}>{video.durationMin} {s.minutes}</span>
-                </span>
+          <div ref={gridRef} className={styles.tgGrid}>
+            {videos.map((video, i) => {
+              const ready = !!video.url && video.url !== '#';
+              return (
+                <button
+                  key={video.id}
+                  type="button"
+                  className={`${styles.tgCard} ${ready ? '' : styles.tgCardPending}`}
+                  onClick={() => openLink(video.url)}
+                  disabled={!ready}
+                >
+                  <span className={styles.tgThumb} style={{ background: tool.accent }}>
+                    <span className={styles.tgThumbVeil} aria-hidden="true" />
+                    <span className={styles.tgPlay}><PlayIcon /></span>
+                    <span className={styles.tgDuration}>{video.durationMin} {s.minutes}</span>
+                  </span>
 
-                <span className={styles.tgCardBody}>
-                  <span className={styles.tgCardTitle}>{titleOf(video, i)}</span>
-                  <span className={styles.tgCardMeta}>
-                    <span className={styles.tgLevel}>{s.levels[video.level]}</span>
-                    <span className={ready ? styles.tgWatch : styles.tgSoon}>
-                      {ready ? s.watch : s.soon}
+                  <span className={styles.tgCardBody}>
+                    <span className={styles.tgCardTitle}>{titleOf(video, i)}</span>
+                    <span className={styles.tgCardMeta}>
+                      <span className={styles.tgLevel}>{s.levels[video.level]}</span>
+                      <span className={ready ? styles.tgWatch : styles.tgSoon}>
+                        {ready ? s.watch : s.soon}
+                      </span>
                     </span>
                   </span>
-                </span>
-              </button>
-            );
-          })}
+                </button>
+              );
+            })}
+          </div>
+
+          {settings.links.videoTraining && settings.links.videoTraining !== '#' && (
+            <button
+              type="button"
+              className={styles.tgCatalog}
+              onClick={() => openLink(settings.links.videoTraining)}
+            >
+              {s.catalogCta}
+              <ArrowIcon />
+            </button>
+          )}
         </div>
 
-        {settings.links.videoTraining && settings.links.videoTraining !== '#' && (
-          <button
-            type="button"
-            className={styles.tgCatalog}
-            onClick={() => openLink(settings.links.videoTraining)}
-          >
-            {s.catalogCta}
-            <ArrowIcon />
-          </button>
-        )}
+        <ScrollBar targetRef={scrollRef} />
       </div>
     </div>
   );

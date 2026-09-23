@@ -24,6 +24,7 @@ import {
 import { ICalendarEvent, downloadIcs, outlookDeepLink } from '../data/bookingIcs';
 import { demoBookingContext, demoBusyByStaff } from '../data/bookingDemo';
 import BookingCalendar from './BookingCalendar';
+import ScrollBar from '../ScrollBar';
 
 export interface IBookingExperienceProps {
   open: boolean;
@@ -83,6 +84,7 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
   const demo = settings.booking.demoMode || !graphFactory;
 
   const panelRef = React.useRef<HTMLDivElement>(null);
+  const bodyRef = React.useRef<HTMLDivElement>(null);
   const closingRef = React.useRef<boolean>(false);
   // Trzymamy promise, nie gotowego klienta — przypisanie jest synchroniczne,
   // więc równoległe wywołania współdzielą jedną inicjalizację.
@@ -419,274 +421,278 @@ const BookingExperience: React.FC<IBookingExperienceProps> = ({
           </ol>
         )}
 
-        <div className={styles.bkBody}>
-          {stage === 'loading' && (
-            <div className={styles.bkCenter}>
-              <span className={styles.bkSpinner} aria-hidden="true" />
-              <p className={styles.bkMuted}>{s.loading}</p>
-            </div>
-          )}
+        <div className={styles.sbHost}>
+          <div ref={bodyRef} className={`${styles.bkBody} ${styles.sbScroll}`}>
+            {stage === 'loading' && (
+              <div className={styles.bkCenter}>
+                <span className={styles.bkSpinner} aria-hidden="true" />
+                <p className={styles.bkMuted}>{s.loading}</p>
+              </div>
+            )}
 
-          {stage === 'pick' && context && service && (
-            <>
-              {context.services.length > 1 && (
-                <>
-                  <div className={styles.bkGroupHead}>
-                    <span className={styles.bkGroupIcon}><CalendarIcon /></span>
-                    {s.pickService}
-                  </div>
-                  <div className={styles.bkServiceGrid}>
-                    {context.services.map((item) => {
-                      const active = item.id === service.id;
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          className={`${styles.bkServiceCard} ${active ? styles.bkServiceCardActive : ''}`}
-                          onClick={() => { setService(item); setSlot(undefined); }}
-                          aria-pressed={active}
-                        >
-                          <span className={styles.bkServiceTop}>
-                            <span className={styles.bkServiceName}>{item.displayName}</span>
-                            <span className={`${styles.bkRadio} ${active ? styles.bkRadioOn : ''}`} aria-hidden="true">
-                              {active ? '✓' : ''}
+            {stage === 'pick' && context && service && (
+              <>
+                {context.services.length > 1 && (
+                  <>
+                    <div className={styles.bkGroupHead}>
+                      <span className={styles.bkGroupIcon}><CalendarIcon /></span>
+                      {s.pickService}
+                    </div>
+                    <div className={styles.bkServiceGrid}>
+                      {context.services.map((item) => {
+                        const active = item.id === service.id;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            className={`${styles.bkServiceCard} ${active ? styles.bkServiceCardActive : ''}`}
+                            onClick={() => { setService(item); setSlot(undefined); }}
+                            aria-pressed={active}
+                          >
+                            <span className={styles.bkServiceTop}>
+                              <span className={styles.bkServiceName}>{item.displayName}</span>
+                              <span className={`${styles.bkRadio} ${active ? styles.bkRadioOn : ''}`} aria-hidden="true">
+                                {active ? '✓' : ''}
+                              </span>
                             </span>
-                          </span>
-                          {item.description && (
-                            <span className={styles.bkServiceDesc}>{item.description}</span>
-                          )}
-                          <span className={styles.bkServiceMeta}>
-                            <span className={styles.bkChip}>{item.durationMin} {s.minutes}</span>
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className={styles.bkForPill}>
-                    {s.bookingFor}: <strong>{service.displayName}</strong>
-                  </div>
-                </>
-              )}
-
-              {slotsLoading ? (
-                <div className={styles.bkCenter}>
-                  <span className={styles.bkSpinner} aria-hidden="true" />
-                  <p className={styles.bkMuted}>{s.loading}</p>
-                </div>
-              ) : days.length === 0 ? (
-                <div className={styles.bkCenter}>
-                  <p className={styles.bkEmptyTitle}>{s.noSlots}</p>
-                  <p className={styles.bkMuted}>{s.noSlotsHint}</p>
-                </div>
-              ) : (
-                <>
-                  {selectedDay && (
-                    <p className={styles.bkDayHeading}>
-                      {headingDayFmt.format(new Date(`${selectedDay}T12:00:00Z`))}
-                    </p>
-                  )}
-
-                  <div className={styles.bkPickGrid}>
-                    <div className={styles.bkPickCol}>
-                      <div className={styles.bkGroupHead}>
-                        <span className={styles.bkGroupIcon}><CalendarIcon /></span>
-                        {s.dateLabel}
-                      </div>
-                      <BookingCalendar
-                        locale={locale}
-                        slotsByDay={slotsByDay}
-                        selectedDay={selectedDay}
-                        onSelectDay={setSelectedDay}
-                        minDay={minDay}
-                        maxDay={maxDay}
-                        labels={{ prevMonth: s.prevMonth, nextMonth: s.nextMonth }}
-                      />
+                            {item.description && (
+                              <span className={styles.bkServiceDesc}>{item.description}</span>
+                            )}
+                            <span className={styles.bkServiceMeta}>
+                              <span className={styles.bkChip}>{item.durationMin} {s.minutes}</span>
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
 
-                    <div className={styles.bkPickCol}>
-                      <div className={styles.bkGroupHead}>
-                        <span className={styles.bkGroupIcon}><ClockIcon /></span>
-                        {s.timeLabel}
-                      </div>
-                      {activeDay ? (
-                        <div className={styles.bkSlotGrid}>
-                          {activeDay.slots.map((item) => (
-                            <button
-                              key={item.start.getTime()}
-                              type="button"
-                              className={styles.bkSlot}
-                              onClick={() => { setSlot(item); setStage('confirm'); }}
-                            >
-                              {timeFmt.format(item.start)}
-                            </button>
-                          ))}
+                    <div className={styles.bkForPill}>
+                      {s.bookingFor}: <strong>{service.displayName}</strong>
+                    </div>
+                  </>
+                )}
+
+                {slotsLoading ? (
+                  <div className={styles.bkCenter}>
+                    <span className={styles.bkSpinner} aria-hidden="true" />
+                    <p className={styles.bkMuted}>{s.loading}</p>
+                  </div>
+                ) : days.length === 0 ? (
+                  <div className={styles.bkCenter}>
+                    <p className={styles.bkEmptyTitle}>{s.noSlots}</p>
+                    <p className={styles.bkMuted}>{s.noSlotsHint}</p>
+                  </div>
+                ) : (
+                  <>
+                    {selectedDay && (
+                      <p className={styles.bkDayHeading}>
+                        {headingDayFmt.format(new Date(`${selectedDay}T12:00:00Z`))}
+                      </p>
+                    )}
+
+                    <div className={styles.bkPickGrid}>
+                      <div className={styles.bkPickCol}>
+                        <div className={styles.bkGroupHead}>
+                          <span className={styles.bkGroupIcon}><CalendarIcon /></span>
+                          {s.dateLabel}
                         </div>
-                      ) : (
-                        <p className={styles.bkMuted}>{s.pickDay}</p>
-                      )}
+                        <BookingCalendar
+                          locale={locale}
+                          slotsByDay={slotsByDay}
+                          selectedDay={selectedDay}
+                          onSelectDay={setSelectedDay}
+                          minDay={minDay}
+                          maxDay={maxDay}
+                          labels={{ prevMonth: s.prevMonth, nextMonth: s.nextMonth }}
+                        />
+                      </div>
+
+                      <div className={styles.bkPickCol}>
+                        <div className={styles.bkGroupHead}>
+                          <span className={styles.bkGroupIcon}><ClockIcon /></span>
+                          {s.timeLabel}
+                        </div>
+                        {activeDay ? (
+                          <div className={styles.bkSlotGrid}>
+                            {activeDay.slots.map((item) => (
+                              <button
+                                key={item.start.getTime()}
+                                type="button"
+                                className={styles.bkSlot}
+                                onClick={() => { setSlot(item); setStage('confirm'); }}
+                              >
+                                {timeFmt.format(item.start)}
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className={styles.bkMuted}>{s.pickDay}</p>
+                        )}
+                      </div>
                     </div>
+
+                    <p className={styles.bkTzNote}>
+                      <GlobeIcon />
+                      {s.allTimesIn} {tzLabel}
+                    </p>
+                  </>
+                )}
+              </>
+            )}
+
+            {(stage === 'confirm' || stage === 'sending') && slot && service && (
+              <>
+                <dl className={styles.bkSummary}>
+                  <div className={styles.bkSummaryRow}>
+                    <dt>{s.summaryWhat}</dt>
+                    <dd>{service.displayName} · {service.durationMin} {s.minutes}</dd>
                   </div>
+                  <div className={styles.bkSummaryRow}>
+                    <dt>{s.summaryWhen}</dt>
+                    <dd>{longDayFmt.format(slot.start)}</dd>
+                  </div>
+                  <div className={styles.bkSummaryRow}>
+                    <dt>{s.summaryWho}</dt>
+                    <dd>{name || email}</dd>
+                  </div>
+                </dl>
 
-                  <p className={styles.bkTzNote}>
-                    <GlobeIcon />
-                    {s.allTimesIn} {tzLabel}
-                  </p>
-                </>
-              )}
-            </>
-          )}
+                <div className={styles.bkFields}>
+                  <label className={styles.bkField}>
+                    <span className={styles.bkFieldLabel}>{s.nameLabel}</span>
+                    <input
+                      className={styles.bkInput}
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      disabled={stage === 'sending'}
+                    />
+                  </label>
+                  <label className={styles.bkField}>
+                    <span className={styles.bkFieldLabel}>{s.emailLabel}</span>
+                    <input
+                      className={styles.bkInput}
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={stage === 'sending'}
+                    />
+                  </label>
+                </div>
 
-          {(stage === 'confirm' || stage === 'sending') && slot && service && (
-            <>
-              <dl className={styles.bkSummary}>
-                <div className={styles.bkSummaryRow}>
-                  <dt>{s.summaryWhat}</dt>
-                  <dd>{service.displayName} · {service.durationMin} {s.minutes}</dd>
-                </div>
-                <div className={styles.bkSummaryRow}>
-                  <dt>{s.summaryWhen}</dt>
-                  <dd>{longDayFmt.format(slot.start)}</dd>
-                </div>
-                <div className={styles.bkSummaryRow}>
-                  <dt>{s.summaryWho}</dt>
-                  <dd>{name || email}</dd>
-                </div>
-              </dl>
-
-              <div className={styles.bkFields}>
                 <label className={styles.bkField}>
-                  <span className={styles.bkFieldLabel}>{s.nameLabel}</span>
-                  <input
-                    className={styles.bkInput}
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                  <span className={styles.bkFieldLabel}>{s.notesLabel}</span>
+                  <textarea
+                    className={styles.bkTextarea}
+                    rows={3}
+                    value={notes}
+                    placeholder={s.notesPlaceholder}
+                    onChange={(e) => setNotes(e.target.value)}
                     disabled={stage === 'sending'}
                   />
                 </label>
-                <label className={styles.bkField}>
-                  <span className={styles.bkFieldLabel}>{s.emailLabel}</span>
-                  <input
-                    className={styles.bkInput}
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+
+                {error && <p className={styles.bkError}>{errorText()}</p>}
+
+                <div className={styles.bkActions}>
+                  <button
+                    type="button"
+                    className={styles.bkGhostBtn}
+                    onClick={() => { setStage('pick'); setError(undefined); }}
                     disabled={stage === 'sending'}
-                  />
-                </label>
+                  >
+                    {s.back}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.bkPrimaryBtn}
+                    onClick={() => { submit().catch(() => undefined); }}
+                    disabled={stage === 'sending' || !email}
+                  >
+                    {stage === 'sending' ? s.submitting : s.submit}
+                    {stage !== 'sending' && <ArrowIcon />}
+                  </button>
+                </div>
+              </>
+            )}
+
+            {stage === 'done' && slot && (
+              <div className={styles.bkCenter}>
+                <span className={styles.bkTick} aria-hidden="true">✓</span>
+                <h3 className={styles.bkDoneTitle}>{demo ? s.demoDoneTitle : s.successTitle}</h3>
+                <p className={styles.bkDoneWhen}>{longDayFmt.format(slot.start)}</p>
+                <p className={styles.bkMuted}>{demo ? s.demoDoneLead : s.successMail}</p>
+                <div className={styles.bkActions}>
+                  {calendarEvent && (
+                    <button
+                      type="button"
+                      className={styles.bkGhostBtn}
+                      onClick={() => downloadIcs(calendarEvent, 'ai-tech-bar')}
+                    >
+                      {s.addToCalendar}
+                    </button>
+                  )}
+                  <button type="button" className={styles.bkPrimaryBtn} onClick={requestClose}>
+                    {s.done}
+                  </button>
+                </div>
               </div>
+            )}
 
-              <label className={styles.bkField}>
-                <span className={styles.bkFieldLabel}>{s.notesLabel}</span>
-                <textarea
-                  className={styles.bkTextarea}
-                  rows={3}
-                  value={notes}
-                  placeholder={s.notesPlaceholder}
-                  onChange={(e) => setNotes(e.target.value)}
-                  disabled={stage === 'sending'}
-                />
-              </label>
-
-              {error && <p className={styles.bkError}>{errorText()}</p>}
-
-              <div className={styles.bkActions}>
-                <button
-                  type="button"
-                  className={styles.bkGhostBtn}
-                  onClick={() => { setStage('pick'); setError(undefined); }}
-                  disabled={stage === 'sending'}
-                >
-                  {s.back}
-                </button>
-                <button
-                  type="button"
-                  className={styles.bkPrimaryBtn}
-                  onClick={() => { submit().catch(() => undefined); }}
-                  disabled={stage === 'sending' || !email}
-                >
-                  {stage === 'sending' ? s.submitting : s.submit}
-                  {stage !== 'sending' && <ArrowIcon />}
-                </button>
-              </div>
-            </>
-          )}
-
-          {stage === 'done' && slot && (
-            <div className={styles.bkCenter}>
-              <span className={styles.bkTick} aria-hidden="true">✓</span>
-              <h3 className={styles.bkDoneTitle}>{demo ? s.demoDoneTitle : s.successTitle}</h3>
-              <p className={styles.bkDoneWhen}>{longDayFmt.format(slot.start)}</p>
-              <p className={styles.bkMuted}>{demo ? s.demoDoneLead : s.successMail}</p>
-              <div className={styles.bkActions}>
-                {calendarEvent && (
+            {stage === 'fallback' && calendarEvent && (
+              <div className={styles.bkCenter}>
+                <h3 className={styles.bkDoneTitle}>{s.fallbackTitle}</h3>
+                <p className={styles.bkMuted}>{s.fallbackLead}</p>
+                <p className={styles.bkError}>{errorText()}</p>
+                <div className={styles.bkActions}>
                   <button
                     type="button"
                     className={styles.bkGhostBtn}
                     onClick={() => downloadIcs(calendarEvent, 'ai-tech-bar')}
                   >
-                    {s.addToCalendar}
+                    {s.fallbackCta}
                   </button>
-                )}
-                <button type="button" className={styles.bkPrimaryBtn} onClick={requestClose}>
-                  {s.done}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {stage === 'fallback' && calendarEvent && (
-            <div className={styles.bkCenter}>
-              <h3 className={styles.bkDoneTitle}>{s.fallbackTitle}</h3>
-              <p className={styles.bkMuted}>{s.fallbackLead}</p>
-              <p className={styles.bkError}>{errorText()}</p>
-              <div className={styles.bkActions}>
-                <button
-                  type="button"
-                  className={styles.bkGhostBtn}
-                  onClick={() => downloadIcs(calendarEvent, 'ai-tech-bar')}
-                >
-                  {s.fallbackCta}
-                </button>
-                <a
-                  className={styles.bkPrimaryBtn}
-                  href={outlookDeepLink(calendarEvent)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {s.openOutlook}
-                  <ArrowIcon />
-                </a>
-              </div>
-            </div>
-          )}
-
-          {stage === 'failed' && (
-            <div className={styles.bkCenter}>
-              <p className={styles.bkEmptyTitle}>{errorText()}</p>
-              <div className={styles.bkActions}>
-                <button
-                  type="button"
-                  className={styles.bkGhostBtn}
-                  onClick={() => { loadContext().catch(() => undefined); }}
-                >
-                  {s.retry}
-                </button>
-                {settings.links.booking && settings.links.booking !== '#' && (
                   <a
                     className={styles.bkPrimaryBtn}
-                    href={settings.links.booking}
+                    href={outlookDeepLink(calendarEvent)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {s.openOriginal}
+                    {s.openOutlook}
                     <ArrowIcon />
                   </a>
-                )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {stage === 'failed' && (
+              <div className={styles.bkCenter}>
+                <p className={styles.bkEmptyTitle}>{errorText()}</p>
+                <div className={styles.bkActions}>
+                  <button
+                    type="button"
+                    className={styles.bkGhostBtn}
+                    onClick={() => { loadContext().catch(() => undefined); }}
+                  >
+                    {s.retry}
+                  </button>
+                  {settings.links.booking && settings.links.booking !== '#' && (
+                    <a
+                      className={styles.bkPrimaryBtn}
+                      href={settings.links.booking}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {s.openOriginal}
+                      <ArrowIcon />
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <ScrollBar targetRef={bodyRef} />
         </div>
       </div>
     </div>

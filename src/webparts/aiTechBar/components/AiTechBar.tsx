@@ -16,6 +16,7 @@ import StrefaSzkolen from './sections/StrefaSzkolen';
 import BookingSection from './sections/BookingSection';
 import PolicySection from './sections/PolicySection';
 import NewsSection from './sections/NewsSection';
+import ScrollBar from './ScrollBar';
 
 // Kolejność paneli full-page (jeden gest scrolla = jeden panel).
 const SECTION_ORDER = [
@@ -350,6 +351,11 @@ const AiTechBar: React.FC<IAiTechBarProps> = (props) => {
           <NewsSection settings={settings} />
         </div>
       </div>
+
+      {/* Poza .landing, bo .page dostaje transformy z GSAP-a, a te psują
+          position: fixed potomkom. W trybie snap pomijamy pasek: tam jeden
+          gest = jeden panel i natywny scrollbar też jest wyłączony. */}
+      {!introVisible && !snapActive && <ScrollBar targetRef={landingRef} variant="fixed" />}
 
       {!introVisible && (
         <div className={styles.appCredit}>

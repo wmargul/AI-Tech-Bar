@@ -605,8 +605,9 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(139, 92, 246, 0.5) transparent;
+  // Natywny pasek schowany — rysuje go ScrollBar.tsx (wariant 'fixed').
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 // podczas intro — strona ukryta pod overlayem i niescrollowalna
@@ -624,11 +625,7 @@
   will-change: transform, opacity, filter;
 }
 
-.landing::-webkit-scrollbar { width: 8px; }
-.landing::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--c-accent-from), var(--c-accent-to));
-  border-radius: 8px;
-}
+.landing::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 .section {
   position: relative;
@@ -4127,17 +4124,10 @@
 .bkStepDone .bkStepDot { background: rgba(110, 231, 255, 0.2); color: #6ee7ff; }
 
 // ---------- Ciało ----------
+// Przewijanie i chowanie natywnego paska bierze się z .sbScroll; tutaj zostaje
+// sam wygląd treści.
 .bkBody {
   padding: 20px 28px 28px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(139, 92, 246, 0.5) transparent;
-}
-
-.bkBody::-webkit-scrollbar { width: 8px; }
-.bkBody::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--c-accent-from), var(--c-accent-to));
-  border-radius: 8px;
 }
 
 .bkLead {
@@ -4758,22 +4748,18 @@
   width: 100%;
   max-width: 1080px;
   max-height: 88vh;
-  overflow-y: auto;
-  padding: 34px 36px 32px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   border-radius: 28px;
   background: linear-gradient(165deg, rgba(24, 28, 56, 0.96), rgba(12, 15, 34, 0.98));
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
-  scrollbar-width: thin;
-  scrollbar-color: rgba(139, 92, 246, 0.5) transparent;
 }
 
-.tgPanel::-webkit-scrollbar { width: 8px; }
-.tgPanel::-webkit-scrollbar-track { background: transparent; }
-.tgPanel::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--c-accent-from), var(--c-accent-to));
-  border-radius: 8px;
-}
+// Padding przeniesiony z panelu na warstwę przewijaną, żeby pasek mógł stać
+// przy krawędzi panelu, a nie odjeżdżać razem z treścią.
+.tgScroll { padding: 34px 36px 32px; }
 
 // Cienki pasek w kolorze narzędzia — wiąże galerię z kartą, z której weszła.
 .tgAccent {
@@ -5089,23 +5075,13 @@
   width: 100%;
   max-width: 1040px;
   max-height: 90vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   border-radius: 28px;
   background: linear-gradient(165deg, rgba(24, 28, 56, 0.96), rgba(12, 15, 34, 0.98));
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
-  scrollbar-width: thin;
-  scrollbar-color: rgba(139, 92, 246, 0.5) transparent;
-}
-
-// Domyślny pasek przewijania jest jasny i wybija się na ciemnym panelu —
-// ten sam zabieg co na .landing i .bkBody. Track jawnie przezroczysty, bo
-// samo ostylowanie kciuka zostawia w WebKicie jasne tło toru.
-.ggPanel::-webkit-scrollbar { width: 8px; }
-.ggPanel::-webkit-scrollbar-track { background: transparent; }
-.ggPanel::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--c-accent-from), var(--c-accent-to));
-  border-radius: 8px;
 }
 
 // --- nagłówek celu ------------------------------------------------------------
@@ -5757,4 +5733,92 @@
   .ggClose:hover { transform: none; }
   .ggFaqAWrap { transition: none; }
   .ggTabInk { transition: none; }
+}
+
+// =============================================================================
+// Własny pasek przewijania (ScrollBar.tsx).
+//
+// Kolory wpisane wprost, a NIE przez var(--c-accent-*): nakładki renderują się
+// portalem do document.body, czyli poza .app, gdzie te zmienne są zdefiniowane.
+// =============================================================================
+
+// Kontener przewijany naszym paskiem — natywny chowamy we wszystkich silnikach.
+.sbScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sbScroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+// Wrapper dla przypadków, gdzie przewijany element jest już elementem flex
+// i nie może sam być rodzicem paska.
+.sbHost {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sbTrack,
+.sbTrackFixed {
+  width: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.sbTrack {
+  position: absolute;
+  top: 10px;
+  right: 5px;
+  bottom: 10px;
+  z-index: 4;
+}
+
+.sbTrackFixed {
+  position: fixed;
+  top: 14px;
+  right: 6px;
+  bottom: 14px;
+  z-index: 999991;
+}
+
+.sbTrack[data-visible='true'],
+.sbTrackFixed[data-visible='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sbThumb {
+  width: 6px;
+  margin: 0 auto;
+  border-radius: 999px;
+  cursor: grab;
+  opacity: 0.55;
+  background: linear-gradient(180deg, #8b5cf6, #22d3ee);
+  will-change: transform;
+  transition: opacity 0.2s ease, width 0.2s ease;
+}
+
+.sbTrack:hover .sbThumb,
+.sbTrackFixed:hover .sbThumb {
+  width: 8px;
+  opacity: 0.9;
+}
+
+.sbThumb:active {
+  cursor: grabbing;
+  opacity: 1;
+  width: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sbTrack,
+  .sbTrackFixed,
+  .sbThumb { transition: none; }
 }
