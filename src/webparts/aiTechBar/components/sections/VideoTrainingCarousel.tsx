@@ -80,6 +80,13 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
 
   const activeRef = React.useRef<number>(0);
   activeRef.current = active;
+
+  // Zamrozenie licznika: otwarta galeria, odtwarzane nagranie (nasza karta w
+  // tle) albo kursor na karuzeli. Trzymane w ref i sprawdzane w kazdej klatce,
+  // a nie jako warunek wejscia do efektu — dzieki temu dziala natychmiast i za
+  // kazdym razem, niezaleznie od tego, kiedy React przeliczy efekty.
+  const frozenRef = React.useRef<boolean>(false);
+  frozenRef.current = paused || !!galleryTool || tabHidden;
   const busyRef = React.useRef<boolean>(false); // trwa przejście → blokuj kolejne zmiany
 
   const resetProgress = React.useCallback((): void => { progressRef.current = 0; }, []);
@@ -360,7 +367,7 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
 
   // Autoplay + pasek postępu (jedna pętla rAF steruje obydwoma).
   React.useEffect(() => {
-    if (!open || paused || galleryTool || tabHidden || count <= 1 || phase !== 'shown') return undefined;
+    if (!open || count <= 1 || phase !== 'shown') return undefined;
     const reduceMotion =
       typeof window !== 'undefined' && window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -368,28 +375,32 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
     let raf = 0;
     let last = performance.now();
     const tick = (now: number): void => {
-      // Ograniczenie kroku: po dluzszej przerwie (karta w tle, uspiony system)
-      // pojedyncza klatka z ogromnym dt dopchnelaby pasek do konca i przeskoczyla
-      // slajd, zamiast wznowic od zamrozonego punktu.
+      // `last` przesuwamy takze w zamrozeniu — inaczej po zamknieciu galerii
+      // pierwsza klatka doliczylaby caly czas jej ogladania. Dodatkowy limit
+      // 100 ms chroni przed skokiem po powrocie z karty w tle albo uspienia.
       const dt = Math.min(now - last, 100);
       last = now;
-      if (busyRef.current) {
-        // trwa przejście — wstrzymaj pasek przy końcu, nie skacz dalej
-        progressRef.current = Math.min(progressRef.current, 1);
-      } else {
-        progressRef.current += dt / AUTOPLAY_MS;
-        if (progressRef.current >= 1) {
-          progressRef.current = 0;
-          commit((activeRef.current + 1) % count, 1);
+
+      if (!frozenRef.current) {
+        if (busyRef.current) {
+          // trwa przejście — wstrzymaj pasek przy końcu, nie skacz dalej
+          progressRef.current = Math.min(progressRef.current, 1);
+        } else {
+          progressRef.current += dt / AUTOPLAY_MS;
+          if (progressRef.current >= 1) {
+            progressRef.current = 0;
+            commit((activeRef.current + 1) % count, 1);
+          }
         }
+        force((n) => (n + 1) % 1000000);
       }
-      force((n) => (n + 1) % 1000000);
       raf = requestAnimationFrame(tick);
     };
 
     if (reduceMotion) {
       // bez animacji paska — proste przewijanie czasowe
       const id = window.setInterval(() => {
+        if (frozenRef.current) return;
         commit((activeRef.current + 1) % count, 1);
       }, AUTOPLAY_MS);
       return () => window.clearInterval(id);
@@ -397,7 +408,7 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [open, paused, galleryTool, tabHidden, count, phase, commit]);
+  }, [open, count, phase, commit]);
 
   // Klawiatura: strzałki + Escape.
   React.useEffect(() => {
