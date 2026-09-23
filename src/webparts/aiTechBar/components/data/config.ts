@@ -28,6 +28,19 @@ export interface ITool {
   singleButtonUrl?: string;
 }
 
+export type TrainingLevel = 'basic' | 'intermediate' | 'advanced';
+
+export interface ITrainingVideo {
+  id: string;
+  /** Tytuł nagrania. Pominięty = brany z i18n (wersja placeholder). */
+  title?: string;
+  /** Czas trwania w minutach. */
+  durationMin: number;
+  level: TrainingLevel;
+  /** Link do nagrania; '#' oznacza „w przygotowaniu" i wyłącza kafelek. */
+  url: string;
+}
+
 export interface IGoal {
   id: string;
   index: string;
@@ -201,6 +214,33 @@ export const TOOLS: ITool[] = [
     singleButtonUrl: LINKS.allTools
   }
 ];
+
+// --- Galeria materiałów szkoleniowych -----------------------------------------
+/**
+ * Szkielet galerii pokazywany, dopóki dla narzędzia nie ma prawdziwych nagrań.
+ * Tytuły pochodzą z i18n (`trainingPlaceholders`), żeby działały w obu językach.
+ */
+export const TRAINING_PLACEHOLDERS: ITrainingVideo[] = [
+  { id: 'intro', durationMin: 4, level: 'basic', url: '#' },
+  { id: 'setup', durationMin: 6, level: 'basic', url: '#' },
+  { id: 'daily', durationMin: 8, level: 'intermediate', url: '#' },
+  { id: 'prompts', durationMin: 7, level: 'intermediate', url: '#' },
+  { id: 'advanced', durationMin: 11, level: 'advanced', url: '#' },
+  { id: 'pitfalls', durationMin: 5, level: 'advanced', url: '#' }
+];
+
+/**
+ * Prawdziwe nagrania, kluczowane identyfikatorem narzędzia z TOOLS.
+ * Dodanie wpisu automatycznie zastępuje placeholdery dla tego narzędzia:
+ *   'copilot': [{ id: 'cp-1', title: 'Copilot w Outlooku', durationMin: 6,
+ *                 level: 'basic', url: 'https://…' }]
+ */
+export const TRAINING_VIDEOS: { [toolId: string]: ITrainingVideo[] } = {};
+
+export const trainingVideosFor = (toolId: string): ITrainingVideo[] => {
+  const real = TRAINING_VIDEOS[toolId];
+  return real && real.length > 0 ? real : TRAINING_PLACEHOLDERS;
+};
 
 /** Unikalne tagi narzędzi (do chipów filtra) — z pominięciem kafelka katalogu. */
 export const TOOL_TAGS: string[] = (() => {

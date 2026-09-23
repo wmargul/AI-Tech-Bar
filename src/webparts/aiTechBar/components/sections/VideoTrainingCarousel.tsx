@@ -7,6 +7,7 @@ import { useL10n } from '../i18n';
 import WarpField from './WarpField';
 import ConstellationBackground from '../background/ConstellationBackground';
 import ToolLogo from './ToolLogo';
+import TrainingGallery from './TrainingGallery';
 
 export interface IVideoTrainingCarouselProps {
   open: boolean;
@@ -21,11 +22,6 @@ const QUEUE_SIZE = 4;
 const GAP_PX = 28; // odstęp między kartami kolejki (musi pokrywać się z SCSS .vtcQueueRow gap)
 const WARP_IN_MS = 1500;   // wejście kinowe
 const WARP_OUT_MS = 1500;  // rozpad przy zamknięciu (taki sam czas jak wejście)
-
-const openLink = (url: string): void => {
-  if (!url || url === '#') return;
-  window.open(url, '_blank', 'noopener,noreferrer');
-};
 
 const pad2 = (n: number): string => (n < 10 ? `0${n}` : `${n}`);
 
@@ -75,6 +71,8 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
   const [query, setQuery] = React.useState<string>('');
   const [notFound, setNotFound] = React.useState<boolean>(false);
   const [paused, setPaused] = React.useState<boolean>(false);
+  const [galleryTool, setGalleryTool] = React.useState<ITool | undefined>(undefined);
+  const [galleryOrigin, setGalleryOrigin] = React.useState<{ x: number; y: number } | undefined>(undefined);
   const [dir, setDir] = React.useState<1 | -1>(1);
   const progressRef = React.useRef<number>(0);
   const [, force] = React.useState<number>(0);
@@ -351,7 +349,7 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
 
   // Autoplay + pasek postępu (jedna pętla rAF steruje obydwoma).
   React.useEffect(() => {
-    if (!open || paused || count <= 1 || phase !== 'shown') return undefined;
+    if (!open || paused || galleryTool || count <= 1 || phase !== 'shown') return undefined;
     const reduceMotion =
       typeof window !== 'undefined' && window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -385,7 +383,7 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [open, paused, count, phase, commit]);
+  }, [open, paused, galleryTool, count, phase, commit]);
 
   // Klawiatura: strzałki + Escape.
   React.useEffect(() => {
@@ -437,7 +435,10 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
       <button
         type="button"
         className={styles.vtcCta}
-        onClick={() => openLink(settings.links.videoTraining)}
+        onClick={(e) => {
+          setGalleryOrigin({ x: e.clientX, y: e.clientY });
+          setGalleryTool(tool);
+        }}
       >
         {s.carouselCta}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -595,7 +596,20 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
     </div>
   );
 
-  return createPortal(overlay, document.body);
+  return (
+    <>
+      {createPortal(overlay, document.body)}
+      {galleryTool && (
+        <TrainingGallery
+          open={!!galleryTool}
+          onClose={() => setGalleryTool(undefined)}
+          tool={galleryTool}
+          settings={settings}
+          origin={galleryOrigin}
+        />
+      )}
+    </>
+  );
 };
 
 export default VideoTrainingCarousel;

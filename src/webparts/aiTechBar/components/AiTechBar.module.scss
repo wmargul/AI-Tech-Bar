@@ -4727,3 +4727,321 @@
   color: #2a1a05;
   background: #ffb04a;
 }
+
+// =============================================================================
+// Galeria materiałów szkoleniowych (nakładka nad karuzelą szkoleń wideo).
+// z-index ponad .vtcOverlay (999995), bo otwiera się z jej wnętrza.
+// =============================================================================
+.tgOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 24px;
+}
+
+.tgScrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(6, 9, 24, 0.78);
+  backdrop-filter: blur(16px);
+}
+
+.tgPanel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1080px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 34px 36px 32px;
+  border-radius: 28px;
+  background: linear-gradient(165deg, rgba(24, 28, 56, 0.96), rgba(12, 15, 34, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+}
+
+// Cienki pasek w kolorze narzędzia — wiąże galerię z kartą, z której weszła.
+.tgAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 28px 28px 0 0;
+}
+
+.tgHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.tgHeadLogo {
+  flex: 0 0 auto;
+  width: 62px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tgHeadText { flex: 1 1 auto; min-width: 0; }
+
+.tgEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+
+.tgEyebrowLine {
+  width: 26px;
+  height: 1px;
+  background: linear-gradient(90deg, #b39bff, #6ee7ff);
+}
+
+.tgTitle {
+  margin: 8px 0 6px;
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--c-text);
+}
+
+.tgLead {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--c-text-dim);
+}
+
+.tgClose {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.tgClose:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(90deg);
+}
+
+.tgNote {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 22px;
+  padding: 13px 16px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--c-text-dim);
+  background: rgba(110, 231, 255, 0.07);
+  border: 1px solid rgba(110, 231, 255, 0.2);
+}
+
+.tgNote::before {
+  content: 'i';
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #0c1330;
+  background: #6ee7ff;
+}
+
+.tgGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.tgCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+}
+
+.tgCard:hover:not(:disabled) {
+  transform: translateY(-5px);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 20px 48px rgba(40, 24, 96, 0.45);
+}
+
+// Nagranie w przygotowaniu: kafelek zostaje czytelny, ale nie udaje klikalnego.
+.tgCardPending { cursor: default; }
+.tgCardPending .tgThumb { filter: saturate(0.5); }
+.tgCardPending .tgPlay { opacity: 0.4; }
+
+.tgThumb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+}
+
+// Przyciemnienie gradientu, żeby ikona i czas trwania miały kontrast.
+.tgThumbVeil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 11, 28, 0.25), rgba(8, 11, 28, 0.72));
+}
+
+.tgPlay {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  padding-left: 3px;
+  border-radius: 50%;
+  color: #12183a;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  transition: transform 0.28s ease;
+}
+
+.tgCard:hover:not(:disabled) .tgPlay { transform: scale(1.1); }
+
+.tgDuration {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: rgba(8, 11, 28, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.tgCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px 18px;
+}
+
+.tgCardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--c-text);
+}
+
+.tgCardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tgLevel {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--c-text-dim);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tgWatch {
+  font-size: 12.5px;
+  font-weight: 700;
+  background-image: linear-gradient(100deg, #b39bff, #6ee7ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.tgSoon {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+
+.tgCatalog {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 26px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  transition: gap 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.tgCatalog:hover {
+  gap: 14px;
+  background: rgba(139, 92, 246, 0.16);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+@media (max-width: 960px) {
+  .tgGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .tgOverlay { padding: 16px 12px; }
+  .tgPanel { padding: 24px 20px 22px; max-height: 92vh; }
+  .tgGrid { grid-template-columns: 1fr; }
+  .tgHead { gap: 14px; }
+  .tgHeadLogo { width: 50px; height: 50px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tgCard:hover:not(:disabled) { transform: none; }
+  .tgCard:hover:not(:disabled) .tgPlay { transform: none; }
+  .tgClose:hover { transform: none; }
+}

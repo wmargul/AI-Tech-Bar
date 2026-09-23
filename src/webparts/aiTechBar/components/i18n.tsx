@@ -86,6 +86,13 @@ export interface IStrings {
   toolText: { [id: string]: IToolText };
   goalText: { [id: string]: IGoalText };
   newsText: { [id: string]: INewsText };
+  gallery: {
+    eyebrow: string; lead: string; close: string;
+    soon: string; minutes: string; watch: string; catalogCta: string; note: string;
+    levels: { basic: string; intermediate: string; advanced: string };
+  };
+  /** Tytuly placeholderow galerii; {tool} podmieniane na nazwe narzedzia. */
+  trainingPlaceholders: string[];
   policyRules: { title: string; text: string }[];
 }
 
@@ -323,6 +330,25 @@ const PL: IStrings = {
       excerpt: 'Doprecyzowaliśmy reguły dotyczące danych poufnych i weryfikacji wyników. Zapoznaj się z nową wersją polityki.'
     }
   },
+  gallery: {
+    eyebrow: 'Materiały szkoleniowe',
+    lead: 'Krótkie nagrania, po których zaczniesz korzystać z narzędzia od razu.',
+    close: 'Zamknij',
+    soon: 'Wkrótce',
+    minutes: 'min',
+    watch: 'Obejrzyj',
+    catalogCta: 'Zobacz wszystkie szkolenia',
+    note: 'Nagrania są w przygotowaniu — poniżej plan materiałów, które pojawią się w tej galerii.',
+    levels: { basic: 'Podstawy', intermediate: 'Średnio zaawansowane', advanced: 'Zaawansowane' }
+  },
+  trainingPlaceholders: [
+    'Pierwsze kroki z {tool}',
+    'Konfiguracja i dostęp',
+    '{tool} w codziennej pracy',
+    'Skuteczne prompty i przykłady',
+    'Zaawansowane scenariusze',
+    'Najczęstsze błędy i jak ich uniknąć'
+  ],
   policyRules: [
     {
       title: 'Decyzja należy do Ciebie',
@@ -577,6 +603,25 @@ const EN: IStrings = {
       excerpt: 'We clarified the rules on confidential data and result verification. Take a look at the new version of the policy.'
     }
   },
+  gallery: {
+    eyebrow: 'Training materials',
+    lead: 'Short recordings that get you using the tool straight away.',
+    close: 'Close',
+    soon: 'Coming soon',
+    minutes: 'min',
+    watch: 'Watch',
+    catalogCta: 'See all training',
+    note: 'Recordings are in production — below is the plan of materials that will land in this gallery.',
+    levels: { basic: 'Basics', intermediate: 'Intermediate', advanced: 'Advanced' }
+  },
+  trainingPlaceholders: [
+    'Getting started with {tool}',
+    'Setup and access',
+    '{tool} in day-to-day work',
+    'Effective prompts and examples',
+    'Advanced scenarios',
+    'Common mistakes and how to avoid them'
+  ],
   policyRules: [
     {
       title: 'The decision is yours',
