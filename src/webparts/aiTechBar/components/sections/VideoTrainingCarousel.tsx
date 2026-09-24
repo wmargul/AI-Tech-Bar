@@ -82,9 +82,10 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
   activeRef.current = active;
 
   // Zamrozenie licznika: otwarta galeria, odtwarzane nagranie (nasza karta w
-  // tle) albo kursor na karuzeli. Trzymane w ref i sprawdzane w kazdej klatce,
-  // a nie jako warunek wejscia do efektu — dzieki temu dziala natychmiast i za
-  // kazdym razem, niezaleznie od tego, kiedy React przeliczy efekty.
+  // tle) albo trwajace zamykanie. Samo najechanie kursorem NIE zatrzymuje
+  // karuzeli. Trzymane w ref i sprawdzane w kazdej klatce, a nie jako warunek
+  // wejscia do efektu — dzieki temu dziala natychmiast i za kazdym razem,
+  // niezaleznie od tego, kiedy React przeliczy efekty.
   const frozenRef = React.useRef<boolean>(false);
   frozenRef.current = paused || !!galleryTool || tabHidden;
   const busyRef = React.useRef<boolean>(false); // trwa przejście → blokuj kolejne zmiany
@@ -480,8 +481,6 @@ const VideoTrainingCarousel: React.FC<IVideoTrainingCarouselProps> = ({ open, on
       role="dialog"
       aria-modal="true"
       aria-label={s.carouselEyebrow}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
     >
       {/* Tło: ta sama interaktywna konstelacja AI Tech co na całej stronie */}
       <div ref={bgsRef} className={styles.vtcBgs} aria-hidden="true">
